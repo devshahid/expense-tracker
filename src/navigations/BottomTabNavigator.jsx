@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import HomeStackNavigator from './stack-navigators/HomeStackNavigator';
 import BookStackNavigator from './stack-navigators/BookStackNavigator';
@@ -20,27 +20,23 @@ const BottomTabNavigator = () => {
         name="HomeStack"
         component={HomeStackNavigator}
         options={{
-          tabBarIcon: ({focused}) => {
+          tabBarIcon: ({ focused }) => {
             return (
-              <Icon
-                name="home"
-                size={25}
-                style={{color: focused ? '#7F3DFF' : '#C6C6C6'}}
-              />
+              <Icon name="home" size={25} style={{ color: focused ? '#7F3DFF' : '#C6C6C6' }} />
             );
           },
         }}
       />
       <Tab.Screen
-        name="Transaction"
+        name="Add Expense"
         component={BookStackNavigator}
         options={{
-          tabBarIcon: ({focused}) => {
+          tabBarIcon: ({ focused }) => {
             return (
               <IconFontisto
                 name="arrow-swap"
                 size={25}
-                style={{color: focused ? '#7F3DFF' : '#C6C6C6'}}
+                style={{ color: focused ? '#7F3DFF' : '#C6C6C6' }}
               />
             );
           },
@@ -50,13 +46,9 @@ const BottomTabNavigator = () => {
         name="Pay"
         component={ContactStackNavigator}
         options={{
-          tabBarIcon: ({focused}) => {
+          tabBarIcon: ({ focused }) => {
             return (
-              <Icon
-                name="qrcode"
-                size={25}
-                style={{color: focused ? '#7F3DFF' : '#C6C6C6'}}
-              />
+              <Icon name="qrcode" size={25} style={{ color: focused ? '#7F3DFF' : '#C6C6C6' }} />
             );
           },
         }}
@@ -65,12 +57,12 @@ const BottomTabNavigator = () => {
         name="Buget"
         component={ContactStackNavigator}
         options={{
-          tabBarIcon: ({focused}) => {
+          tabBarIcon: ({ focused }) => {
             return (
               <IconFontisto
                 name="wallet"
                 size={25}
-                style={{color: focused ? '#7F3DFF' : '#C6C6C6'}}
+                style={{ color: focused ? '#7F3DFF' : '#C6C6C6' }}
               />
             );
           },
@@ -80,13 +72,9 @@ const BottomTabNavigator = () => {
         name="Profile"
         component={ContactStackNavigator}
         options={{
-          tabBarIcon: ({focused}) => {
+          tabBarIcon: ({ focused }) => {
             return (
-              <Icon
-                name="user"
-                size={25}
-                style={{color: focused ? '#7F3DFF' : '#C6C6C6'}}
-              />
+              <Icon name="user" size={25} style={{ color: focused ? '#7F3DFF' : '#C6C6C6' }} />
             );
           },
         }}

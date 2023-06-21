@@ -1,0 +1,38 @@
+export const transactionItems = [
+  {
+    title: 'Shopping',
+    description: 'Buy some groceries',
+    amount: '- 100 ₹',
+    time: '10:25 AM',
+    icon: 'shopping-bag',
+    color: '#FC33C4',
+    backgroundColor: '#FCEED4',
+  },
+  {
+    title: 'Food',
+    description: 'Buy some food',
+    amount: '- 180 ₹',
+    time: '11:05 AM',
+    icon: 'utensils',
+    color: '#FD3C4A',
+    backgroundColor: '#FDD5D7',
+  },
+  {
+    title: 'Travel',
+    description: 'Buy train ticket',
+    amount: '- 3000 ₹',
+    time: '01:35 PM',
+    icon: 'car',
+    color: '#414F12',
+    backgroundColor: '#CCE281',
+  },
+  {
+    title: 'Petrol',
+    description: 'Petrol purchase',
+    amount: '- 200 ₹',
+    time: '08:25 PM',
+    icon: 'gas-pump',
+    color: '#8B7E66',
+    backgroundColor: '#B0A593',
+  },
+];

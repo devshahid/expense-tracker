@@ -6,7 +6,7 @@ const Stack = createStackNavigator();
 
 const Book = () => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Book screen!</Text>
+    <Text style={{ color: '#000000' }}>Add your Expense Here</Text>
   </View>
 );
 

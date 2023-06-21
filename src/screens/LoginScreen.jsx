@@ -1,16 +1,8 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {Image} from 'react-native';
-import SignUp from '../../assets/Signup.png';
+import { useNavigation } from '@react-navigation/native';
+import { Image } from 'react-native';
+import SignUp from '../assets/Signup.png';
 const Login = () => {
   const navigation = useNavigation();
   function handleScreen() {
@@ -37,7 +29,9 @@ const Login = () => {
             secureTextEntry
           />
           <TouchableOpacity style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>Login</Text>
+            <Text style={styles.loginButtonText} onPress={handleScreen}>
+              Login
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

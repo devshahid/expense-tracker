@@ -1,7 +1,7 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import DrawerNavigator from '../navigations/DrawerNavigator';
-const Home = () => {
+const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <DrawerNavigator />
@@ -16,4 +16,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home;
+export default HomeScreen;
