@@ -1,10 +1,64 @@
-import React from 'react';
-import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import TransactionView from '../../views/TransactionView';
-import TabsView from '../../views/TabsView';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import LineGraph from '../../assets/line-graph.png';
+import { LineChart } from 'react-native-chart-kit';
+import Tabs from './Tabs';
+
 const HomeMain = ({ navigation }) => {
+  const [selectedTab, setSelectedTab] = useState('Today');
+  const [graphLabels, setGraphLabels] = useState([
+    '6AM-10AM',
+    '10AM-2PM',
+    '2PM-6PM',
+    '6PM-10PM',
+    '10PM-2AM',
+  ]);
+  const [graphData, setGraphData] = useState([10, 15, 20, 12, 50]);
+  const [tooltipData, setTooltipData] = useState(null);
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    if (selectedTab === 'Today') {
+      setGraphLabels(['6AM-10AM', '10AM-2PM', '2PM-6PM', '6PM-10PM', '10PM-2AM']);
+      setGraphData([10, 15, 20, 12, 50]);
+    } else if (selectedTab === 'Week') {
+      setGraphLabels(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+      setGraphData([254, 967, 142, 1000, 365, 111, 657]);
+    } else if (selectedTab === 'Month') {
+      setGraphLabels([
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'June',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ]);
+      setGraphData([666, 214, 475, 325, 10, 444, 857, 375, 124, 555, 325, 656]);
+    } else if (selectedTab === 'Year') {
+      setGraphLabels(['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']);
+      setGraphData([45, 968, 534, 852, 678, 751, 321]);
+    }
+  }, [selectedTab]);
+
+  const handleDataPointClick = (data, x, y, index) => {
+    const selectedDataPoint = data[index];
+    console.log(data, index, x, y, selectedDataPoint);
+    setTooltipData(selectedDataPoint);
+    setTooltipPosition({ x, y });
+  };
+  const Tooltip = ({ data, x, y }) => {
+    return (
+      <View style={[styles.tooltipContainer, { top: y - 30, left: x - 30 }]}>
+        <Text style={styles.tooltipText}>Amount: {data.amount}</Text>
+      </View>
+    );
+  };
   return (
     <>
       <ScrollView>
@@ -36,9 +90,65 @@ const HomeMain = ({ navigation }) => {
             <Text style={styles.graphViewLabel}>Spend Frequency</Text>
           </View>
           <View style={styles.graphContainer}>
-            <Image source={LineGraph} style={styles.graphImage} />
+            <LineChart
+              data={{
+                labels: graphLabels,
+                datasets: [
+                  {
+                    data: graphData,
+                    color: (opacity = 1) => `rgba(78, 38, 102, ${opacity})`,
+                  },
+                ],
+              }}
+              width={Dimensions.get('window').width - 10} // from react-native
+              height={220}
+              yAxisLabel="₹ "
+              chartConfig={{
+                propsForVerticalLabels: {
+                  fontSize: 10,
+                  fontWeight: 'bold',
+                  opacity: 1,
+                },
+                backgroundColor: '#e26a00',
+                backgroundGradientFrom: '#a8c0ff',
+                backgroundGradientTo: '#3f2b96',
+                decimalPlaces: 0, // optional, defaults to 2dp
+                color: (opacity = 1) => `rgba(39, 17, 79, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                fillShadowGradientOpacity: 0.5,
+                fillShadowGradient: '#FFFFFF',
+                style: {
+                  borderRadius: 16,
+                },
+                propsForDots: {
+                  r: '6',
+                  strokeWidth: '1',
+                  stroke: '#FFFFFF',
+                },
+              }}
+              bezier
+              style={{
+                marginVertical: 8,
+                borderRadius: 16,
+              }}
+              onDataPointClick={({ index, value, x, y }) =>
+                handleDataPointClick(graphData, x, y, index)
+              }
+            />
+            {tooltipData && (
+              <Tooltip data={tooltipData} x={tooltipPosition.x} y={tooltipPosition.y} />
+            )}
           </View>
-          <TabsView />
+          <View style={styles.tabMainContainer}>
+            {['Today', 'Week', 'Month', 'Year'].map((element, i) => (
+              <Tabs
+                key={i}
+                focused={element}
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+              />
+            ))}
+          </View>
           <TransactionView />
         </View>
       </ScrollView>
@@ -97,7 +207,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   graphContainer: {
-    height: 150,
+    minheight: 150,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -127,6 +237,22 @@ const styles = StyleSheet.create({
   addIcon: {
     backgroundColor: '#7F3DFF',
     color: '#FFFFFF',
+  },
+  tabMainContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    marginVertical: 5,
+    marginTop: 20,
+  },
+  tooltipContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    padding: 8,
+    borderRadius: 4,
+  },
+  tooltipText: {
+    color: '#000000',
   },
 });
 export default HomeMain;

@@ -11,13 +11,13 @@ const AddExpense = ({ navigation }) => {
   const [categoryValue, setCategoryValue] = useState('');
   const [isFocus, setIsFocus] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('Select Date');
+  const [selectedDate, setSelectedDate] = useState(moment().utc().format('DD-MM-YYYY'));
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
 
   const handleConfirm = date => {
-    const selectedDate = moment(date).utc().add(1, 'day').format('DD-MM-YYYY');
+    const selectedDate = moment(date).utc().format('DD-MM-YYYY');
     setSelectedDate(selectedDate);
     hideDatePicker();
   };
