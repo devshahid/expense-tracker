@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
 import TransactionView from '../../views/TransactionView';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { LineChart } from 'react-native-chart-kit';
 import Tabs from './Tabs';
 
-const HomeMain = ({ navigation }) => {
+const HomeMain = ({ navigation, route }) => {
   const [selectedTab, setSelectedTab] = useState('Today');
   const [graphLabels, setGraphLabels] = useState([
     '6AM-10AM',
@@ -17,6 +25,7 @@ const HomeMain = ({ navigation }) => {
   const [graphData, setGraphData] = useState([10, 15, 20, 12, 50]);
   const [tooltipData, setTooltipData] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     if (selectedTab === 'Today') {
       setGraphLabels(['6AM-10AM', '10AM-2PM', '2PM-6PM', '6PM-10PM', '10PM-2AM']);
@@ -59,9 +68,15 @@ const HomeMain = ({ navigation }) => {
       </View>
     );
   };
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <>
-      <ScrollView>
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View style={{ flex: 1, marginHorizontal: 5, backgroundColor: '#FFFFFF' }}>
           <View style={styles.balanceContainer}>
             <Text style={styles.balanceStyle}>₹ 10000</Text>
@@ -135,9 +150,9 @@ const HomeMain = ({ navigation }) => {
                 handleDataPointClick(graphData, x, y, index)
               }
             />
-            {tooltipData && (
+            {/* {tooltipData && (
               <Tooltip data={tooltipData} x={tooltipPosition.x} y={tooltipPosition.y} />
-            )}
+            )} */}
           </View>
           <View style={styles.tabMainContainer}>
             {['Today', 'Week', 'Month', 'Year'].map((element, i) => (
@@ -149,7 +164,7 @@ const HomeMain = ({ navigation }) => {
               />
             ))}
           </View>
-          <TransactionView />
+          <TransactionView route={route} />
         </View>
       </ScrollView>
       <View id="add_expense_container" style={styles.addExpContainer}>

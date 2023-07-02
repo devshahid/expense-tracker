@@ -17,7 +17,7 @@ const BottomTabNavigator = () => {
         tabBarInactiveTintColor: '#C6C6C6',
       }}>
       <Tab.Screen
-        name="HomeStack"
+        name="Home"
         component={HomeStackNavigator}
         options={{
           tabBarIcon: ({ focused }) => {

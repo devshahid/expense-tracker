@@ -5,6 +5,7 @@ import MainScreen from './src/screens/MainScreen';
 import Login from './src/screens/LoginScreen';
 import LoginHeader from './src/components/Login/Header';
 import OnboardingScreen from './src/screens/OnboardingScreen';
+import AddExpense from './src/screens/AddExpense';
 
 const NativeStack = createNativeStackNavigator();
 function App() {
@@ -24,6 +25,11 @@ function App() {
           component={Login}
         />
         <NativeStack.Screen name="OnBoardingScreen" component={OnboardingScreen} />
+        <NativeStack.Screen
+          name="Add_Expense"
+          options={{ headerShown: false }}
+          component={AddExpense}
+        />
       </NativeStack.Navigator>
     </NavigationContainer>
   );

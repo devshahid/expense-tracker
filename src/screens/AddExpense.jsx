@@ -1,44 +1,104 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  Modal,
+} from 'react-native';
+import React, { useState, useEffect } from 'react';
 import IconIonics from 'react-native-vector-icons/Ionicons';
-import { Dropdown } from 'react-native-element-dropdown';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { categoryOptions, paymentOptions } from '../constants/data';
+import DropdownContainer from '../components/Modal/DropdownContainer';
+import Icon from 'react-native-vector-icons/FontAwesome5';
+
 const AddExpense = ({ navigation }) => {
   const [selectedBox, setSelectedBox] = useState('debit');
   const [selectedHeaderTxt, setSelectedHeaderTxt] = useState('Expense');
-  const [paymentValue, setPaymentValue] = useState('Select payment mode');
-  const [categoryValue, setCategoryValue] = useState('');
-  const [isFocus, setIsFocus] = useState(false);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(moment().utc().format('DD-MM-YYYY'));
+  const date = new Date();
+  const formattedDate = moment(date);
+  const [selectedDate, setSelectedDate] = useState(moment(formattedDate).format('DD-MM-YYYY'));
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [transactionDetails, setTransactionDetails] = useState({
+    name: null,
+    amount: null,
+    paymentMode: 'Payment Mode',
+    category: 'Select Category',
+    date: formattedDate,
+    isExpense: true,
+  });
+  const checkEmptyInput = value => {
+    if (value) return true;
+    else return false;
+  };
+  useEffect(() => {
+    const { name, amount, paymentMode, category } = transactionDetails;
+    if (
+      checkEmptyInput(name) &&
+      checkEmptyInput(amount) &&
+      checkEmptyInput(paymentMode) &&
+      checkEmptyInput(category)
+    ) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+  }, [transactionDetails]);
+
+  const handleInputs = (event, name) => {
+    setTransactionDetails({
+      ...transactionDetails,
+      [name]: event.nativeEvent.text,
+    });
+  };
+  const handleFormData = (name, value) => {
+    setTransactionDetails({
+      ...transactionDetails,
+      [name]: value,
+    });
+  };
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
-
   const handleConfirm = date => {
-    const selectedDate = moment(date).utc().format('DD-MM-YYYY');
+    const selectedDate = moment(date).format('DD-MM-YYYY');
     setSelectedDate(selectedDate);
     hideDatePicker();
+    handleFormData('date', date);
   };
   const handleDateVisibility = () => {
     setDatePickerVisibility(!isDatePickerVisible);
   };
-  const paymentOptions = [
-    { label: 'Google Pay', value: 'gpay' },
-    { label: 'Phone Pay', value: 'phonepay' },
-    { label: 'Paytm', value: 'paytm' },
-    { label: 'Amazon Pay', value: 'amazonpay' },
-    { label: 'Cash', value: 'cash' },
-    { label: 'Other', value: 'other' },
-  ];
-  const categoryOptions = [
-    { label: 'Food', value: 'food' },
-    { label: 'Travel', value: 'travel' },
-    { label: 'Petrol', value: 'petrol' },
-    { label: 'Friend', value: 'friend' },
-    { label: 'Other', value: 'other' },
-  ];
+  const handleSubmit = async () => {
+    const transactionData = await AsyncStorage.getItem('transactionData');
+    if (!transactionData) {
+      const dataArr = [];
+      dataArr.push(transactionDetails);
+      await AsyncStorage.setItem('transactionData', JSON.stringify(dataArr));
+    } else {
+      const dataArr = JSON.parse(transactionData);
+      dataArr.push(transactionDetails);
+      await AsyncStorage.setItem('transactionData', JSON.stringify(dataArr));
+      console.log('dataArr => ', dataArr);
+    }
+    navigation.navigate('HomeMain', { isData: true });
+  };
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const openModal = type => {
+    setModalVisible(true);
+    setModalType(type);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setModalType('');
+  };
   return (
     <View
       style={[
@@ -66,6 +126,7 @@ const AddExpense = ({ navigation }) => {
             placeholderTextColor={'#FCFCFC'}
             style={[styles.amountValue, { fontSize: 60 }]}
             keyboardType="numeric"
+            onEndEditing={value => handleInputs(value, 'amount')}
           />
         </View>
       </View>
@@ -73,7 +134,12 @@ const AddExpense = ({ navigation }) => {
         <View style={styles.formContainer}>
           <View style={styles.row}>
             <View style={styles.inputContainer}>
-              <TextInput style={styles.input} placeholder="Name" placeholderTextColor={'grey'} />
+              <TextInput
+                style={styles.input}
+                onEndEditing={value => handleInputs(value, 'name')}
+                placeholder="Name"
+                placeholderTextColor={'grey'}
+              />
             </View>
           </View>
           <View style={styles.incomeExpContainer}>
@@ -87,6 +153,7 @@ const AddExpense = ({ navigation }) => {
               onPress={() => {
                 setSelectedBox('debit');
                 setSelectedHeaderTxt('Expense');
+                handleFormData('isExpense', true);
               }}>
               <Text
                 style={[
@@ -106,6 +173,7 @@ const AddExpense = ({ navigation }) => {
               onPress={() => {
                 setSelectedBox('credit');
                 setSelectedHeaderTxt('Income');
+                handleFormData('isExpense', false);
               }}>
               <Text
                 style={[
@@ -117,48 +185,20 @@ const AddExpense = ({ navigation }) => {
             </TouchableOpacity>
           </View>
           <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              iconStyle={styles.iconStyle}
-              itemContainerStyle={styles.dropdownListContainer}
-              itemTextStyle={{ color: '#000000' }}
-              data={paymentOptions}
-              maxHeight={200}
-              labelField="label"
-              valueField="value"
-              placeholder={'Payment Mode'}
-              value={paymentValue}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
-              onChange={item => {
-                setIsFocus(false);
-                setPaymentValue(item);
-              }}
-            />
+            <TouchableOpacity
+              onPress={() => openModal('Payment')}
+              style={[styles.dropdown, styles.dropDownWithArrow]}>
+              <Text style={styles.selectedTextStyle}>{transactionDetails.paymentMode}</Text>
+              <Icon name="chevron-down" size={20} style={styles.iconStyle} />
+            </TouchableOpacity>
           </View>
           <View style={styles.dropdownContainer}>
-            <Dropdown
-              style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              iconStyle={styles.iconStyle}
-              itemContainerStyle={styles.dropdownListContainer}
-              itemTextStyle={{ color: '#000000' }}
-              data={categoryOptions}
-              maxHeight={200}
-              labelField="label"
-              valueField="value"
-              placeholder={'Select Category'}
-              value={categoryValue}
-              onFocus={() => setIsFocus(true)}
-              onBlur={() => setIsFocus(false)}
-              onChange={item => {
-                setIsFocus(false);
-                setCategoryValue(item);
-              }}
-            />
+            <TouchableOpacity
+              onPress={() => openModal('Category')}
+              style={[styles.dropdown, styles.dropDownWithArrow]}>
+              <Text style={styles.selectedTextStyle}>{transactionDetails.category}</Text>
+              <Icon name="chevron-down" size={20} style={styles.iconStyle} />
+            </TouchableOpacity>
           </View>
 
           <View style={{ width: '100%' }}>
@@ -167,12 +207,44 @@ const AddExpense = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.submitBtnContainer}>
-            <TouchableOpacity style={styles.submitBtn}>
-              <Text style={styles.submitBtnTxt}>Submit</Text>
+          <View
+            style={[
+              styles.submitBtnContainer,
+              buttonDisabled ? { backgroundColor: '#CCCCCC' } : { backgroundColor: '#7F3DFF' },
+            ]}>
+            <TouchableOpacity
+              disabled={buttonDisabled}
+              style={styles.submitBtn}
+              onPress={handleSubmit}>
+              <Text
+                style={[
+                  styles.submitBtnTxt,
+                  buttonDisabled ? { color: '#AAAAAA' } : { color: '#FFFFFF' },
+                ]}>
+                Submit
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
+        {modalType === 'Category' ? (
+          <DropdownContainer
+            type="Category"
+            options={categoryOptions}
+            visible={modalVisible}
+            onClose={closeModal}
+            transactionDetails={transactionDetails}
+            setTransactionDetails={setTransactionDetails}
+          />
+        ) : (
+          <DropdownContainer
+            type="Payment"
+            options={paymentOptions}
+            visible={modalVisible}
+            onClose={closeModal}
+            transactionDetails={transactionDetails}
+            setTransactionDetails={setTransactionDetails}
+          />
+        )}
       </ScrollView>
       <DateTimePickerModal
         isVisible={isDatePickerVisible}
@@ -201,7 +273,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     alignItems: 'center',
     paddingHorizontal: 10,
-    marginTop: 80,
     paddingVertical: 20,
   },
   amountValue: {
@@ -238,6 +309,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     height: 60,
+    color: '#000000',
   },
   incomeExpContainer: {
     width: '75%',
@@ -287,6 +359,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     color: '#000000',
   },
+  dropDownWithArrow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   placeholderStyle: {
     fontSize: 16,
     color: '#000000',
@@ -297,8 +374,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   iconStyle: {
-    width: 30,
-    height: 30,
+    color: '#000000',
+    paddingRight: 10,
   },
   dropdownListContainer: {
     paddingHorizontal: 10,
@@ -311,7 +388,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginVertical: 20,
-    backgroundColor: '#7F3DFF',
   },
   submitBtn: {
     width: '100%',
@@ -323,7 +399,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     alignItems: 'center',
     fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   selectDateContainer: {
     width: '75%',

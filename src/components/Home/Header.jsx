@@ -1,8 +1,13 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HeaderComponent = ({ onBalanceClick, navigation }) => {
+  const showLocalData = async () => {
+    const transactionData = await AsyncStorage.getItem('transactionData');
+    console.log('transactionData value => ', transactionData);
+  };
   return (
     <View
       style={{
@@ -13,7 +18,7 @@ const HeaderComponent = ({ onBalanceClick, navigation }) => {
         padding: 10,
         backgroundColor: '#FFFFFF',
       }}>
-      <TouchableOpacity style={styles.iconContainer}>
+      <TouchableOpacity style={styles.iconContainer} onPress={showLocalData}>
         <Icon
           onPress={() => navigation.openDrawer()}
           name="user"

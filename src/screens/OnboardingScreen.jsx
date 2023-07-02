@@ -6,12 +6,11 @@ const OnboardingScreen = ({ navigation }) => {
   useEffect(() => {
     async function getItems() {
       const status = await AsyncStorage.getItem('isLoggedIn');
-      if (JSON.parse(status) == 'true') {
+      if (JSON.parse(status) === true) {
         navigation.replace('MainScreen');
       } else {
         navigation.replace('Login');
       }
-      console.log('status', status, typeof status);
     }
     getItems();
   }, []);
