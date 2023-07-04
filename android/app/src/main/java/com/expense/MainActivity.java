@@ -1,4 +1,4 @@
-package com.expense;
+package com.shahidandroidapp.expensetracker;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

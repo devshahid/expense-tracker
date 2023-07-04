@@ -17,7 +17,6 @@ const Login = () => {
     password: '',
   });
   const handleFormData = (value, name) => {
-    console.log(value, name);
     setUserDetails({
       ...userDetails,
       [name]: value,
@@ -29,7 +28,7 @@ const Login = () => {
       correctDetails.password === userDetails.password
     ) {
       await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-      navigation.navigate('MainScreen');
+      navigation.replace('MainScreen');
     } else {
       alert('Invalid User');
       console.log('Invalid user');
