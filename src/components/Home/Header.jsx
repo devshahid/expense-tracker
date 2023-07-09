@@ -1,12 +1,26 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 const HeaderComponent = ({ onBalanceClick, navigation }) => {
+  useEffect(() => {
+    GoogleSignin.configure({
+      androidClientId: process.env.ANDROID_CLIENT_ID,
+    });
+  }, []);
   const showLocalData = async () => {
     const transactionData = await AsyncStorage.getItem('transactionData');
     console.log('transactionData value => ', transactionData);
+  };
+  const handleLogout = async () => {
+    try {
+      await GoogleSignin.signOut();
+      await AsyncStorage.removeItem('isLoggedIn');
+      navigation.replace('Login');
+    } catch (error) {
+      console.error(error);
+    }
   };
   return (
     <View
@@ -28,7 +42,7 @@ const HeaderComponent = ({ onBalanceClick, navigation }) => {
           }}
         />
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleLogout}>
         <Text
           style={{
             color: '#000000',
