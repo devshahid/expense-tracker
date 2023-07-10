@@ -50,10 +50,10 @@ const AddExpense = ({ navigation }) => {
     }
   }, [transactionDetails]);
 
-  const handleInputs = (event, name) => {
+  const handleInputs = (value, name) => {
     setTransactionDetails({
       ...transactionDetails,
-      [name]: event.nativeEvent.text,
+      [name]: value,
     });
   };
   const handleFormData = (name, value) => {
@@ -126,17 +126,17 @@ const AddExpense = ({ navigation }) => {
             placeholderTextColor={'#FCFCFC'}
             style={[styles.amountValue, { fontSize: 60 }]}
             keyboardType="numeric"
-            onEndEditing={value => handleInputs(value, 'amount')}
+            onChangeText={value => handleInputs(value, 'amount')}
           />
         </View>
       </View>
-      <ScrollView style={styles.scrollFormContainer}>
+      <ScrollView style={styles.scrollFormContainer} keyboardShouldPersistTaps="handled">
         <View style={styles.formContainer}>
           <View style={styles.row}>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                onEndEditing={value => handleInputs(value, 'name')}
+                onChangeText={value => handleInputs(value, 'name')}
                 placeholder="Name"
                 placeholderTextColor={'grey'}
               />

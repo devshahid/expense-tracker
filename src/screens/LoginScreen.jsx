@@ -1,12 +1,16 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
 import { Image } from 'react-native';
 import LoginImage from '../assets/Login.png';
 import GoogleLogo from '../assets/google-logo.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const Login = () => {
-  const navigation = useNavigation();
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+const Login = ({ navigation }) => {
+  useEffect(() => {
+    GoogleSignin.configure({
+      androidClientId: process.env.ANDROID_CLIENT_ID,
+    });
+  }, []);
 
   const correctDetails = {
     email: 'shahid@gmail.com',
@@ -16,6 +20,7 @@ const Login = () => {
     email: '',
     password: '',
   });
+  const [googleUser, setGoogleUser] = useState(null);
   const handleFormData = (value, name) => {
     setUserDetails({
       ...userDetails,
@@ -34,8 +39,34 @@ const Login = () => {
       console.log('Invalid user');
     }
   }
+  const handleGoogleSignIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      setGoogleUser({ userInfo });
+      console.log('userInfo => ', userInfo);
+      if (userInfo) {
+        await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo.user));
+        navigation.replace('MainScreen');
+      }
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        // alert('sign in cancelled');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // alert('sign in progress');
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // alert('sign in not available');
+        // play services not available or outdated
+      } else {
+        // some other error happened
+      }
+    }
+  };
   return (
-    <ScrollView style={styles.scrollContainer}>
+    <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="handled">
       <View style={styles.mainContainer}>
         <View>
           <Image source={LoginImage} style={styles.loginImage} />
@@ -76,7 +107,7 @@ const Login = () => {
           <View style={styles.horizontalDiv} />
         </View>
 
-        <TouchableOpacity style={styles.loginWithGoogleContainer}>
+        <TouchableOpacity style={styles.loginWithGoogleContainer} onPress={handleGoogleSignIn}>
           <Image style={styles.googleIconContainer} source={GoogleLogo} />
           <Text style={styles.loginWithGoogleText}>Login with Google</Text>
         </TouchableOpacity>
@@ -144,7 +175,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   loginButtonText: {
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },
