@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     paddingTop: 20,
     paddingBottom: 10,
+    backgroundColor: '#FFFFFF',
   },
   loginTxt: {
     fontSize: 20,

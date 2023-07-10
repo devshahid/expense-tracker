@@ -1,26 +1,27 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-const HeaderComponent = ({ onBalanceClick, navigation }) => {
+import { Image } from 'react-native';
+import DefaultImage from '../../assets/default-image.png';
+const HeaderComponent = () => {
+  const [userData, setUserData] = useState(null);
   useEffect(() => {
-    GoogleSignin.configure({
-      androidClientId: process.env.ANDROID_CLIENT_ID,
-    });
+    async function getUserInfo() {
+      try {
+        const userInfo = JSON.parse(await AsyncStorage.getItem('userInfo'));
+        if (userInfo.photo) {
+          setUserData(userInfo.photo);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getUserInfo();
   }, []);
   const showLocalData = async () => {
     const transactionData = await AsyncStorage.getItem('transactionData');
     console.log('transactionData value => ', transactionData);
-  };
-  const handleLogout = async () => {
-    try {
-      await GoogleSignin.signOut();
-      await AsyncStorage.removeItem('isLoggedIn');
-      navigation.replace('Login');
-    } catch (error) {
-      console.error(error);
-    }
   };
   return (
     <View
@@ -31,26 +32,31 @@ const HeaderComponent = ({ onBalanceClick, navigation }) => {
         height: 64,
         padding: 10,
         backgroundColor: '#FFFFFF',
+        elevation: 5,
+        borderBottomColor: 'rgba(0, 0, 0, 0.2)',
+        borderBottomWidth: 1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 2,
       }}>
-      <TouchableOpacity style={styles.iconContainer} onPress={showLocalData}>
-        <Icon
-          onPress={() => navigation.openDrawer()}
-          name="user"
-          size={30}
-          style={{
-            color: '#000000',
-          }}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={handleLogout}>
+      <View style={styles.iconContainer} onPress={showLocalData}>
+        {userData ? (
+          <Image source={{ uri: userData }} style={styles.userImage} />
+        ) : (
+          <Image source={DefaultImage} style={[styles.userImage]} />
+        )}
+      </View>
+      <TouchableOpacity>
         <Text
           style={{
             color: '#000000',
+            fontSize: 18,
+            fontWeight: '800',
           }}>
-          Drop Down
+          Total Balance
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={onBalanceClick}>
+      <TouchableOpacity>
         <Icon name="bell" size={30} style={{ color: '#7F3DFF' }} />
       </TouchableOpacity>
     </View>
@@ -61,11 +67,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 25,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#7F3DFF',
+    overflow: 'hidden',
+  },
+  userImage: {
+    width: 40,
+    height: 40,
   },
 });
 export default HeaderComponent;

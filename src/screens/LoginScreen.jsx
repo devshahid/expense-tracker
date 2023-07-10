@@ -1,18 +1,16 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
 import { Image } from 'react-native';
 import LoginImage from '../assets/Login.png';
 import GoogleLogo from '../assets/google-logo.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-const Login = () => {
+const Login = ({ navigation }) => {
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: process.env.ANDROID_CLIENT_ID,
     });
   }, []);
-  const navigation = useNavigation();
 
   const correctDetails = {
     email: 'shahid@gmail.com',
@@ -49,7 +47,8 @@ const Login = () => {
       console.log('userInfo => ', userInfo);
       if (userInfo) {
         await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-        navigation.replace('MainScreen', { userInfo });
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo.user));
+        navigation.replace('MainScreen');
       }
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -176,7 +175,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   loginButtonText: {
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
   },

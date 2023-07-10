@@ -11,12 +11,7 @@ const HomeStackNavigator = () => {
         name="HomeMain"
         component={HomeMain}
         options={{
-          header: ({ navigation }) => (
-            <HeaderComponent
-              navigation={navigation}
-              onProfileClick={() => navigation.openDrawer()}
-            />
-          ),
+          header: () => <HeaderComponent />,
         }}
       />
     </Stack.Navigator>
