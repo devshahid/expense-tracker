@@ -1,5 +1,6 @@
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
+import { Colours } from '../../constants/constant';
 
 const Tabs = props => {
   return (
@@ -8,7 +9,11 @@ const Tabs = props => {
         props.setSelectedTab(props.focused);
       }}
       style={[styles.tabContainer, props.selectedTab == props.focused && styles.focusedTab]}>
-      <Text style={[styles.tabText, props.selectedTab == props.focused && { color: '#FCAC12' }]}>
+      <Text
+        style={[
+          styles.tabText,
+          props.selectedTab == props.focused && { color: Colours.YELLOWISH },
+        ]}>
         {props.focused}
       </Text>
     </TouchableOpacity>

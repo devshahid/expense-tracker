@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, { useState } from 'react';
+import { Colours } from '../../constants/constant';
 
 const DropdownContainer = ({
   visible,
@@ -121,13 +122,13 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginRight: 10,
-    color: 'black',
+    color: Colours.BLACK,
   },
   closeButton: {
     paddingHorizontal: 15,
   },
   closeButtonText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#333',
   },
   itemContainer: {
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 18,
-    color: 'black',
+    color: Colours.BLACK,
   },
   backDrop: {
     flex: 1,

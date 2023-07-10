@@ -3,14 +3,16 @@ import React from 'react';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import { getTransactionItem } from '../../constants/data';
 import moment from 'moment';
+import { Colours } from '../../constants/constant';
 
 const TransactionList = props => {
   const { name, category, amount, date, isExpense } = props;
-  const selectedDate = moment(date).format('DD-MM');
-  const selectedTime = moment(date).format('HH:mm');
+  const selectedDate = moment(date).format('DD-MMM');
   const { icon, color, backgroundColor } = getTransactionItem(category);
   const details =
-    isExpense === true ? { sign: '-', color: '#FD3C4A' } : { sign: '+', color: '#00A86B' };
+    isExpense === true
+      ? { sign: '-', color: Colours.RED_THEME }
+      : { sign: '+', color: Colours.GREEN_THEME };
   return (
     <View style={styles.transactionListContainer}>
       <View style={styles.iconAndTransContainer}>
@@ -33,7 +35,7 @@ const TransactionList = props => {
             ]}>{`${details.sign} ${amount}`}</Text>
         </View>
         <View>
-          <Text style={styles.transactionTime}>{`${selectedTime}, ${selectedDate}`}</Text>
+          <Text style={styles.transactionTime}>{`${selectedDate}`}</Text>
         </View>
       </View>
     </View>
@@ -70,14 +72,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     padding: 2,
-    color: '#000000',
+    color: Colours.BLACK,
     marginRight: 20,
   },
   transactionDesc: {
     fontSize: 14,
     fontWeight: '600',
     padding: 2,
-    color: '#91919F',
+    color: Colours.GREY_WHITE,
   },
   transactionAmount: {
     fontSize: 16,
@@ -86,7 +88,7 @@ const styles = StyleSheet.create({
   transactionTime: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#91919F',
+    color: Colours.GREY_WHITE,
   },
 });
 export default TransactionList;

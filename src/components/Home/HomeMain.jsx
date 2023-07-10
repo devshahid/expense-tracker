@@ -12,6 +12,7 @@ import TransactionView from '../../views/TransactionView';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { LineChart } from 'react-native-chart-kit';
 import Tabs from './Tabs';
+import { Colours } from '../../constants/constant';
 
 const HomeMain = ({ navigation, route }) => {
   const [selectedTab, setSelectedTab] = useState('Today');
@@ -23,8 +24,6 @@ const HomeMain = ({ navigation, route }) => {
     '10PM-2AM',
   ]);
   const [graphData, setGraphData] = useState([10, 15, 20, 12, 50]);
-  const [tooltipData, setTooltipData] = useState(null);
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [refreshing, setRefreshing] = useState(false);
   useEffect(() => {
     if (selectedTab === 'Today') {
@@ -58,15 +57,6 @@ const HomeMain = ({ navigation, route }) => {
   const handleDataPointClick = (data, x, y, index) => {
     const selectedDataPoint = data[index];
     console.log(data, index, x, y, selectedDataPoint);
-    setTooltipData(selectedDataPoint);
-    setTooltipPosition({ x, y });
-  };
-  const Tooltip = ({ data, x, y }) => {
-    return (
-      <View style={[styles.tooltipContainer, { top: y - 30, left: x - 30 }]}>
-        <Text style={styles.tooltipText}>Amount: {data.amount}</Text>
-      </View>
-    );
   };
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -77,23 +67,23 @@ const HomeMain = ({ navigation, route }) => {
   return (
     <>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        <View style={{ flex: 1, marginHorizontal: 5, backgroundColor: '#FFFFFF' }}>
+        <View style={{ flex: 1, marginHorizontal: 5, backgroundColor: Colours.WHITE_PURE }}>
           <View style={styles.balanceContainer}>
             <Text style={styles.balanceStyle}>₹ 10000</Text>
           </View>
           <View style={styles.incomeExpMainContainer}>
-            <View style={[styles.incomeExpContainer, { backgroundColor: '#00A86B' }]}>
+            <View style={[styles.incomeExpContainer, { backgroundColor: Colours.GREEN_THEME }]}>
               <View>
-                <Icon name="plus-circle" size={40} style={{ color: '#FCFCFC' }} />
+                <Icon name="plus-circle" size={40} style={{ color: Colours.WHITISH }} />
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Income</Text>
                 <Text style={styles.incomeExpAmount}>₹ 6000</Text>
               </View>
             </View>
-            <View style={[styles.incomeExpContainer, { backgroundColor: '#FD3C4A' }]}>
+            <View style={[styles.incomeExpContainer, { backgroundColor: Colours.RED_THEME }]}>
               <View>
-                <Icon name="minus-circle" size={40} style={{ color: '#FCFCFC' }} />
+                <Icon name="minus-circle" size={40} style={{ color: Colours.WHITISH }} />
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Expense</Text>
@@ -131,14 +121,14 @@ const HomeMain = ({ navigation, route }) => {
                 color: (opacity = 1) => `rgba(39, 17, 79, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 fillShadowGradientOpacity: 0.5,
-                fillShadowGradient: '#FFFFFF',
+                fillShadowGradient: Colours.WHITE_PURE,
                 style: {
                   borderRadius: 16,
                 },
                 propsForDots: {
                   r: '6',
                   strokeWidth: '1',
-                  stroke: '#FFFFFF',
+                  stroke: Colours.WHITE_PURE,
                 },
               }}
               bezier
@@ -150,9 +140,6 @@ const HomeMain = ({ navigation, route }) => {
                 handleDataPointClick(graphData, x, y, index)
               }
             />
-            {/* {tooltipData && (
-              <Tooltip data={tooltipData} x={tooltipPosition.x} y={tooltipPosition.y} />
-            )} */}
           </View>
           <View style={styles.tabMainContainer}>
             {['Today', 'Week', 'Month', 'Year'].map((element, i) => (
@@ -164,7 +151,7 @@ const HomeMain = ({ navigation, route }) => {
               />
             ))}
           </View>
-          <TransactionView route={route} />
+          <TransactionView route={route} navigation={navigation} />
         </View>
       </ScrollView>
       <View id="add_expense_container" style={styles.addExpContainer}>
@@ -188,7 +175,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 40,
     marginVertical: 10,
-    color: '#000000',
+    color: Colours.BLACK,
   },
   incomeExpMainContainer: {
     flexDirection: 'row',
@@ -205,12 +192,12 @@ const styles = StyleSheet.create({
   incomeExpLabel: {
     fontWeight: 500,
     fontSize: 14,
-    color: '#FCFCFC',
+    color: Colours.WHITISH,
   },
   incomeExpAmount: {
     fontWeight: 600,
     fontSize: 22,
-    color: '#FCFCFC',
+    color: Colours.WHITISH,
   },
   graphViewContainer: {
     marginTop: 20,
@@ -219,7 +206,7 @@ const styles = StyleSheet.create({
   graphViewLabel: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#000000',
+    color: Colours.BLACK,
   },
   graphContainer: {
     minheight: 150,
@@ -237,7 +224,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#7F3DFF',
+    backgroundColor: Colours.PURPLE_THEME,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 5,
@@ -250,8 +237,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addIcon: {
-    backgroundColor: '#7F3DFF',
-    color: '#FFFFFF',
+    backgroundColor: Colours.PURPLE_THEME,
+    color: Colours.WHITE_PURE,
   },
   tabMainContainer: {
     flexDirection: 'row',
@@ -267,7 +254,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   tooltipText: {
-    color: '#000000',
+    color: Colours.BLACK,
   },
 });
 export default HomeMain;

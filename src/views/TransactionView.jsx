@@ -2,7 +2,8 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'rea
 import React, { useEffect, useState } from 'react';
 import TransactionList from '../components/Home/TransactionList';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const TransactionView = ({ route }) => {
+import Icon from 'react-native-vector-icons/Entypo';
+const TransactionView = ({ route, navigation }) => {
   const [dataArr, setDataArr] = useState([]);
   const [showModal, setShowModal] = useState(false);
   console.log('dataArr => ', dataArr);
@@ -14,7 +15,7 @@ const TransactionView = ({ route }) => {
       }
     }
     getTransactionItems();
-  }, [route.params?.isData]);
+  }, [route.params?.isData, showModal, navigation]);
   return (
     <View>
       <View style={[styles.recentContainer, { marginHorizontal: 5 }]}>
@@ -53,17 +54,29 @@ const TransactionView = ({ route }) => {
         )}
       </ScrollView>
       <Modal visible={showModal}>
-        <View>
-          {dataArr.length > 0 &&
-            dataArr.map(({ name }, index) => (
-              <Text key={index} style={{ color: '#000000' }}>
-                {name}
-              </Text>
-            ))}
+        <View style={styles.modalHeaderContainer}>
+          <TouchableOpacity onPress={() => setShowModal(false)}>
+            <Icon name="cross" size={40} style={{ color: '#000000', paddingLeft: 10 }} />
+          </TouchableOpacity>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ color: '#000000', fontSize: 16, fontWeight: '600' }}>
+              View all Transactions
+            </Text>
+          </View>
         </View>
-        <TouchableOpacity onPress={() => setShowModal(false)} style={{ backgroundColor: 'red' }}>
-          <Text style={{ color: '#000000' }}>Close</Text>
-        </TouchableOpacity>
+        <ScrollView>
+          {dataArr.length > 0 &&
+            dataArr.map((element, i) => (
+              <TransactionList
+                key={i}
+                name={element.name}
+                category={element.category}
+                amount={element.amount}
+                date={element.date}
+                isExpense={element.isExpense}
+              />
+            ))}
+        </ScrollView>
       </Modal>
     </View>
   );
@@ -90,6 +103,20 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     color: '#7F3DFF',
     fontSize: 16,
+  },
+  modalHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomColor: 'rgba(0, 0, 0, 0.2)',
+    borderBottomWidth: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 2,
+    paddingTop: 20,
+    paddingBottom: 10,
+    backgroundColor: '#FFFFFF',
   },
 });
 export default TransactionView;

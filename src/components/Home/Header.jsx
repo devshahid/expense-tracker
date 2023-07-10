@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native';
 import DefaultImage from '../../assets/default-image.png';
+import { Colours } from '../../constants/constant';
 const HeaderComponent = () => {
   const [userData, setUserData] = useState(null);
   useEffect(() => {
@@ -49,7 +50,7 @@ const HeaderComponent = () => {
       <TouchableOpacity>
         <Text
           style={{
-            color: '#000000',
+            color: Colours.BLACK,
             fontSize: 18,
             fontWeight: '800',
           }}>
@@ -57,7 +58,7 @@ const HeaderComponent = () => {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity>
-        <Icon name="bell" size={30} style={{ color: '#7F3DFF' }} />
+        <Icon name="bell" size={30} style={{ color: Colours.PURPLE_THEME }} />
       </TouchableOpacity>
     </View>
   );

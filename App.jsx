@@ -6,14 +6,14 @@ import Login from './src/screens/LoginScreen';
 import LoginHeader from './src/components/Login/Header';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import AddExpense from './src/screens/AddExpense';
-
+import { ScreenNames } from './src/constants/constant';
 const NativeStack = createNativeStackNavigator();
 function App() {
   return (
     <NavigationContainer>
-      <NativeStack.Navigator initialRouteName="OnBoardingScreen">
+      <NativeStack.Navigator initialRouteName={ScreenNames.ON_BOARDING_SCREEN}>
         <NativeStack.Screen
-          name="MainScreen"
+          name={ScreenNames.MAIN_SCREEN}
           options={{ headerShown: false }}
           component={MainScreen}
         />
@@ -21,12 +21,12 @@ function App() {
           options={{
             header: ({ navigation }) => <LoginHeader navigation={navigation} />,
           }}
-          name="Login"
+          name={ScreenNames.LOGIN_SCREEN}
           component={Login}
         />
-        <NativeStack.Screen name="OnBoardingScreen" component={OnboardingScreen} />
+        <NativeStack.Screen name={ScreenNames.ON_BOARDING_SCREEN} component={OnboardingScreen} />
         <NativeStack.Screen
-          name="Add_Expense"
+          name={ScreenNames.ADD_EXPENSE_SCREEN}
           options={{ headerShown: false }}
           component={AddExpense}
         />

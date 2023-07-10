@@ -5,6 +5,7 @@ import LoginImage from '../assets/Login.png';
 import GoogleLogo from '../assets/google-logo.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { ScreenNames } from '../constants/constant';
 const Login = ({ navigation }) => {
   useEffect(() => {
     GoogleSignin.configure({
@@ -20,7 +21,6 @@ const Login = ({ navigation }) => {
     email: '',
     password: '',
   });
-  const [googleUser, setGoogleUser] = useState(null);
   const handleFormData = (value, name) => {
     setUserDetails({
       ...userDetails,
@@ -33,7 +33,7 @@ const Login = ({ navigation }) => {
       correctDetails.password === userDetails.password
     ) {
       await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-      navigation.replace('MainScreen');
+      navigation.replace(ScreenNames.MAIN_SCREEN);
     } else {
       alert('Invalid User');
       console.log('Invalid user');
@@ -43,12 +43,11 @@ const Login = ({ navigation }) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      setGoogleUser({ userInfo });
       console.log('userInfo => ', userInfo);
       if (userInfo) {
         await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
         await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo.user));
-        navigation.replace('MainScreen');
+        navigation.replace(ScreenNames.MAIN_SCREEN);
       }
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {

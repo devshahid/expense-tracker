@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { Colours } from '../../constants/constant';
 
 const ProfileTab = () => {
   const navigation = useNavigation();
@@ -23,7 +24,7 @@ const ProfileTab = () => {
   return (
     <View style={styles.container}>
       <View style={styles.profileContainerView}>
-        <Text style={{ color: '#000000' }}>Profile Screen</Text>
+        <Text style={{ color: Colours.BLACK }}>Profile Screen</Text>
       </View>
       <View style={styles.profileContainerView}>
         <TouchableOpacity style={styles.LogoutBtnContainer} onPress={handleLogout}>
@@ -55,5 +56,5 @@ const styles = StyleSheet.create({
     elevation: 1,
     marginBottom: 20,
   },
-  LogoutBtn: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
+  LogoutBtn: { color: Colours.WHITE_PURE, fontSize: 16, fontWeight: 'bold' },
 });

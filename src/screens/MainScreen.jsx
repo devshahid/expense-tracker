@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import HomeStackNavigator from '../navigations/stack-navigators/HomeStackNavigator';
 import ProfileTab from '../components/Profile/ProfileTab';
+import { ScreenNames } from '../constants/constant';
 const Tab = createBottomTabNavigator();
 const MainScreen = () => {
   return (
@@ -16,7 +17,7 @@ const MainScreen = () => {
           tabBarInactiveTintColor: '#C6C6C6',
         }}>
         <Tab.Screen
-          name="Home"
+          name={ScreenNames.HOME_TAB}
           component={HomeStackNavigator}
           options={{
             tabBarIcon: ({ focused }) => {
@@ -28,7 +29,7 @@ const MainScreen = () => {
         />
 
         <Tab.Screen
-          name="Profile"
+          name={ScreenNames.PROFILE_TAB}
           component={ProfileTab}
           options={{
             tabBarIcon: ({ focused }) => {

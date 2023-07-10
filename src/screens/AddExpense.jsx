@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { categoryOptions, paymentOptions } from '../constants/data';
 import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { Colours, ScreenNames } from '../constants/constant';
 
 const AddExpense = ({ navigation }) => {
   const [selectedBox, setSelectedBox] = useState('debit');
@@ -86,7 +87,7 @@ const AddExpense = ({ navigation }) => {
       await AsyncStorage.setItem('transactionData', JSON.stringify(dataArr));
       console.log('dataArr => ', dataArr);
     }
-    navigation.navigate('HomeMain', { isData: true });
+    navigation.navigate(ScreenNames.HOME_MAIN_SCREEN, { isData: true });
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -124,7 +125,7 @@ const AddExpense = ({ navigation }) => {
           <TextInput
             placeholder="0"
             placeholderTextColor={'#FCFCFC'}
-            style={[styles.amountValue, { fontSize: 60 }]}
+            style={[styles.amountValue, { fontSize: 60, width: '100%' }]}
             keyboardType="numeric"
             onChangeText={value => handleInputs(value, 'amount')}
           />
@@ -158,7 +159,9 @@ const AddExpense = ({ navigation }) => {
               <Text
                 style={[
                   styles.radioBtn,
-                  selectedBox === 'debit' ? { color: '#FFFFFF' } : { color: '#000000' },
+                  selectedBox === 'debit'
+                    ? { color: Colours.WHITE_PURE }
+                    : { color: Colours.BLACK },
                 ]}>
                 Debit
               </Text>
@@ -178,7 +181,9 @@ const AddExpense = ({ navigation }) => {
               <Text
                 style={[
                   styles.radioBtn,
-                  selectedBox === 'credit' ? { color: '#FFFFFF' } : { color: '#000000' },
+                  selectedBox === 'credit'
+                    ? { color: Colours.WHITE_PURE }
+                    : { color: Colours.BLACK },
                 ]}>
                 Credit
               </Text>
@@ -203,7 +208,7 @@ const AddExpense = ({ navigation }) => {
 
           <View style={{ width: '100%' }}>
             <TouchableOpacity style={styles.selectDateContainer} onPress={handleDateVisibility}>
-              <Text style={{ color: '#000000' }}>{selectedDate}</Text>
+              <Text style={{ color: Colours.BLACK }}>{selectedDate}</Text>
             </TouchableOpacity>
           </View>
 
@@ -219,7 +224,7 @@ const AddExpense = ({ navigation }) => {
               <Text
                 style={[
                   styles.submitBtnTxt,
-                  buttonDisabled ? { color: '#AAAAAA' } : { color: '#FFFFFF' },
+                  buttonDisabled ? { color: '#AAAAAA' } : { color: Colours.WHITE_PURE },
                 ]}>
                 Submit
               </Text>
