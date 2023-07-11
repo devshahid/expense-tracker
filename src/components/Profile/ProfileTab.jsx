@@ -3,20 +3,24 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { Colours } from '../../constants/constant';
+import { Colours, ScreenNames } from '../../constants/constant';
 
 const ProfileTab = () => {
   const navigation = useNavigation();
   useEffect(() => {
     GoogleSignin.configure({
-      androidClientId: process.env.ANDROID_CLIENT_ID,
+      androidClientId: __DEV__
+        ? process.env.ANDROID_CLIENT_ID
+        : process.env.ANDROID_RELEASE_CLIENT_ID,
     });
   }, []);
   const handleLogout = async () => {
     try {
       await GoogleSignin.signOut();
       await AsyncStorage.removeItem('isLoggedIn');
-      navigation.replace('Login');
+      await AsyncStorage.removeItem('userInfo');
+      await AsyncStorage.removeItem('transactionData');
+      navigation.replace(ScreenNames.ON_BOARDING_SCREEN);
     } catch (error) {
       console.error(error);
     }

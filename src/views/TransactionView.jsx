@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import TransactionList from '../components/Home/TransactionList';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Entypo';
-const TransactionView = ({ route, navigation }) => {
+const TransactionView = ({ route, navigation, toggleTransaction }) => {
   const [dataArr, setDataArr] = useState([]);
   const [showModal, setShowModal] = useState(false);
   console.log('dataArr => ', dataArr);
@@ -15,14 +15,16 @@ const TransactionView = ({ route, navigation }) => {
       }
     }
     getTransactionItems();
-  }, [route.params?.isData, showModal, navigation]);
+  }, [route.params?.isData, showModal, toggleTransaction]);
   return (
     <View>
       <View style={[styles.recentContainer, { marginHorizontal: 5 }]}>
         <Text style={styles.recentText}>Recent Transactions</Text>
-        <TouchableOpacity style={styles.seeAll} onPress={() => setShowModal(true)}>
-          <Text style={styles.seeAllText}>See All</Text>
-        </TouchableOpacity>
+        {dataArr.length > 0 && (
+          <TouchableOpacity style={styles.seeAll} onPress={() => setShowModal(true)}>
+            <Text style={styles.seeAllText}>See All</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <ScrollView>
         {dataArr.length > 0 ? (
@@ -46,7 +48,6 @@ const TransactionView = ({ route, navigation }) => {
               alignSelf: 'center',
               alignItems: 'center',
               minHeight: 100,
-              backgroundColor: '#FC3459',
               width: '100%',
             }}>
             <Text style={{ color: '#000000' }}>No Transaction Available</Text>
@@ -86,6 +87,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginVertical: 10,
   },
   recentText: {
     color: '#000000',

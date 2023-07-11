@@ -25,6 +25,7 @@ const HomeMain = ({ navigation, route }) => {
   ]);
   const [graphData, setGraphData] = useState([10, 15, 20, 12, 50]);
   const [refreshing, setRefreshing] = useState(false);
+  const [toggleTransaction, setToggleTransaction] = useState(false);
   useEffect(() => {
     if (selectedTab === 'Today') {
       setGraphLabels(['6AM-10AM', '10AM-2PM', '2PM-6PM', '6PM-10PM', '10PM-2AM']);
@@ -54,6 +55,10 @@ const HomeMain = ({ navigation, route }) => {
     }
   }, [selectedTab]);
 
+  useEffect(() => {
+    setToggleTransaction(!toggleTransaction);
+  }, [route?.params?.isData]);
+
   const handleDataPointClick = (data, x, y, index) => {
     const selectedDataPoint = data[index];
     console.log(data, index, x, y, selectedDataPoint);
@@ -69,7 +74,7 @@ const HomeMain = ({ navigation, route }) => {
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View style={{ flex: 1, marginHorizontal: 5, backgroundColor: Colours.WHITE_PURE }}>
           <View style={styles.balanceContainer}>
-            <Text style={styles.balanceStyle}>₹ 10000</Text>
+            <Text style={styles.balanceStyle}>₹ 0</Text>
           </View>
           <View style={styles.incomeExpMainContainer}>
             <View style={[styles.incomeExpContainer, { backgroundColor: Colours.GREEN_THEME }]}>
@@ -78,7 +83,7 @@ const HomeMain = ({ navigation, route }) => {
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Income</Text>
-                <Text style={styles.incomeExpAmount}>₹ 6000</Text>
+                <Text style={styles.incomeExpAmount}>₹ 0</Text>
               </View>
             </View>
             <View style={[styles.incomeExpContainer, { backgroundColor: Colours.RED_THEME }]}>
@@ -87,7 +92,7 @@ const HomeMain = ({ navigation, route }) => {
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Expense</Text>
-                <Text style={styles.incomeExpAmount}>₹ 4000</Text>
+                <Text style={styles.incomeExpAmount}>₹ 0</Text>
               </View>
             </View>
           </View>
@@ -151,7 +156,11 @@ const HomeMain = ({ navigation, route }) => {
               />
             ))}
           </View>
-          <TransactionView route={route} navigation={navigation} />
+          <TransactionView
+            route={route}
+            navigation={navigation}
+            toggleTransaction={toggleTransaction}
+          />
         </View>
       </ScrollView>
       <View id="add_expense_container" style={styles.addExpContainer}>
