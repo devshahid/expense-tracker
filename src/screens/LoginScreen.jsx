@@ -7,7 +7,9 @@ import { Images, ScreenNames } from '../constants/constant';
 const Login = ({ navigation }) => {
   useEffect(() => {
     GoogleSignin.configure({
-      androidClientId: process.env.ANDROID_CLIENT_ID,
+      androidClientId: __DEV__
+        ? process.env.ANDROID_CLIENT_ID
+        : process.env.ANDROID_RELEASE_CLIENT_ID,
     });
   }, []);
 

@@ -325,7 +325,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   debitContainer: {
-    backgroundColor: 'red',
     padding: 10,
     width: '50%',
     alignItems: 'center',
@@ -336,9 +335,7 @@ const styles = StyleSheet.create({
   creditContainer: {
     borderTopRightRadius: 10,
     borderBottomEndRadius: 10,
-    backgroundColor: 'red',
     padding: 10,
-    // backgroundColor: '#FD3C4A',
     backgroundColor: '#FFFFFF',
     width: '50%',
     alignItems: 'center',
@@ -388,7 +385,6 @@ const styles = StyleSheet.create({
   submitBtnContainer: {
     flex: 1,
     width: '75%',
-    backgroundColor: 'red',
     justifyContent: 'center',
     borderRadius: 10,
     alignItems: 'center',

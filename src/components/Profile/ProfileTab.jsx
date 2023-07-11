@@ -9,7 +9,9 @@ const ProfileTab = () => {
   const navigation = useNavigation();
   useEffect(() => {
     GoogleSignin.configure({
-      androidClientId: process.env.ANDROID_CLIENT_ID,
+      androidClientId: __DEV__
+        ? process.env.ANDROID_CLIENT_ID
+        : process.env.ANDROID_RELEASE_CLIENT_ID,
     });
   }, []);
   const handleLogout = async () => {
