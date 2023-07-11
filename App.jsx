@@ -6,12 +6,13 @@ import Login from './src/screens/LoginScreen';
 import LoginHeader from './src/components/Login/Header';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import AddExpense from './src/screens/AddExpense';
+import LaunchScreen from './src/screens/LaunchScreen';
 import { ScreenNames } from './src/constants/constant';
 const NativeStack = createNativeStackNavigator();
 function App() {
   return (
     <NavigationContainer>
-      <NativeStack.Navigator initialRouteName={ScreenNames.ON_BOARDING_SCREEN}>
+      <NativeStack.Navigator initialRouteName={ScreenNames.LAUNCH_SCREEN}>
         <NativeStack.Screen
           name={ScreenNames.MAIN_SCREEN}
           options={{ headerShown: false }}
@@ -24,7 +25,16 @@ function App() {
           name={ScreenNames.LOGIN_SCREEN}
           component={Login}
         />
-        <NativeStack.Screen name={ScreenNames.ON_BOARDING_SCREEN} component={OnboardingScreen} />
+        <NativeStack.Screen
+          name={ScreenNames.ON_BOARDING_SCREEN}
+          options={{ headerShown: false }}
+          component={OnboardingScreen}
+        />
+        <NativeStack.Screen
+          name={ScreenNames.LAUNCH_SCREEN}
+          options={{ headerShown: false }}
+          component={LaunchScreen}
+        />
         <NativeStack.Screen
           name={ScreenNames.ADD_EXPENSE_SCREEN}
           options={{ headerShown: false }}

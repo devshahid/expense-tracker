@@ -1,11 +1,9 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Image } from 'react-native';
-import LoginImage from '../assets/Login.png';
-import GoogleLogo from '../assets/google-logo.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import { ScreenNames } from '../constants/constant';
+import { Images, ScreenNames } from '../constants/constant';
 const Login = ({ navigation }) => {
   useEffect(() => {
     GoogleSignin.configure({
@@ -68,7 +66,7 @@ const Login = ({ navigation }) => {
     <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="handled">
       <View style={styles.mainContainer}>
         <View>
-          <Image source={LoginImage} style={styles.loginImage} />
+          <Image source={Images.LOGIN_IMAGE} style={styles.loginImage} />
         </View>
         <View style={styles.labelContainer}>
           <View style={{ alignItems: 'center' }}>
@@ -107,7 +105,7 @@ const Login = ({ navigation }) => {
         </View>
 
         <TouchableOpacity style={styles.loginWithGoogleContainer} onPress={handleGoogleSignIn}>
-          <Image style={styles.googleIconContainer} source={GoogleLogo} />
+          <Image style={styles.googleIconContainer} source={Images.GOOGLE_IMAGE} />
           <Text style={styles.loginWithGoogleText}>Login with Google</Text>
         </TouchableOpacity>
         <View style={styles.signupTextContainer}>

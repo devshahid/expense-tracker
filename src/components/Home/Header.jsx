@@ -3,8 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native';
-import DefaultImage from '../../assets/default-image.png';
-import { Colours } from '../../constants/constant';
+import { Colours, Images } from '../../constants/constant';
 const HeaderComponent = () => {
   const [userData, setUserData] = useState(null);
   useEffect(() => {
@@ -44,7 +43,7 @@ const HeaderComponent = () => {
         {userData ? (
           <Image source={{ uri: userData }} style={styles.userImage} />
         ) : (
-          <Image source={DefaultImage} style={[styles.userImage]} />
+          <Image source={Images.DEFAULT_IMAGE} style={[styles.userImage]} />
         )}
       </View>
       <TouchableOpacity>
