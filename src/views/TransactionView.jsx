@@ -1,21 +1,19 @@
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import TransactionList from '../components/Home/TransactionList';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Entypo';
-const TransactionView = ({ route, navigation, toggleTransaction }) => {
+import SQLite from '../sqlite/sql';
+const TransactionView = ({ toggleTransaction, onRefreshComplete }) => {
   const [dataArr, setDataArr] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  console.log('dataArr => ', dataArr);
   useEffect(() => {
     async function getTransactionItems() {
-      const dataArr = await AsyncStorage.getItem('transactionData');
-      if (dataArr) {
-        setDataArr(JSON.parse(dataArr));
-      }
+      const response = await SQLite.listAllTransactions();
+      console.log('data => ', response);
+      setDataArr(response);
     }
     getTransactionItems();
-  }, [route.params?.isData, showModal, toggleTransaction]);
+  }, [showModal, onRefreshComplete]);
   return (
     <View>
       <View style={[styles.recentContainer, { marginHorizontal: 5 }]}>

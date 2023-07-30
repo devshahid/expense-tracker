@@ -67,8 +67,9 @@ const HomeMain = ({ navigation, route }) => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      setToggleTransaction(!toggleTransaction);
     }, 2000);
-  }, []);
+  });
   return (
     <>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
@@ -160,6 +161,7 @@ const HomeMain = ({ navigation, route }) => {
             route={route}
             navigation={navigation}
             toggleTransaction={toggleTransaction}
+            onRefreshComplete={onRefresh}
           />
         </View>
       </ScrollView>

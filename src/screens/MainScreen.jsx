@@ -4,6 +4,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import HomeStackNavigator from '../navigations/stack-navigators/HomeStackNavigator';
+import HeaderComponent from '../components/Home/Header';
+import HomeMain from '../components/Home/HomeMain';
+
 import ProfileTab from '../components/Profile/ProfileTab';
 import { ScreenNames } from '../constants/constant';
 const Tab = createBottomTabNavigator();
@@ -12,14 +15,14 @@ const MainScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <Tab.Navigator
         screenOptions={{
-          headerShown: false,
           tabBarActiveTintColor: '#7F3DFF',
           tabBarInactiveTintColor: '#C6C6C6',
         }}>
         <Tab.Screen
           name={ScreenNames.HOME_TAB}
-          component={HomeStackNavigator}
+          component={HomeMain}
           options={{
+            header: () => <HeaderComponent />,
             tabBarIcon: ({ focused }) => {
               return (
                 <Icon name="home" size={30} style={{ color: focused ? '#7F3DFF' : '#C6C6C6' }} />
@@ -32,6 +35,7 @@ const MainScreen = () => {
           name={ScreenNames.PROFILE_TAB}
           component={ProfileTab}
           options={{
+            headerShown: false,
             tabBarIcon: ({ focused }) => {
               return (
                 <Icon name="user" size={30} style={{ color: focused ? '#7F3DFF' : '#C6C6C6' }} />

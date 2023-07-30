@@ -1,23 +1,13 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  Modal,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import IconIonics from 'react-native-vector-icons/Ionicons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { categoryOptions, paymentOptions } from '../constants/data';
 import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Colours, ScreenNames } from '../constants/constant';
-import client from '../utils/axios';
-
+import SQLite from '../sqlite/sql';
 const AddExpense = ({ navigation }) => {
   const [selectedBox, setSelectedBox] = useState('debit');
   const [selectedHeaderTxt, setSelectedHeaderTxt] = useState('Expense');
@@ -77,21 +67,12 @@ const AddExpense = ({ navigation }) => {
     setDatePickerVisibility(!isDatePickerVisible);
   };
   const handleSubmit = async () => {
-    const response = await client.post('/api/transactions/add-transactions', transactionDetails);
-    console.log(response.data, response.status);
-
-    const transactionData = await AsyncStorage.getItem('transactionData');
-    if (!transactionData) {
-      const dataArr = [];
-      dataArr.push(transactionDetails);
-      await AsyncStorage.setItem('transactionData', JSON.stringify(dataArr));
+    const response = await SQLite.insertData(transactionDetails);
+    if (response == 1) {
+      navigation.navigate(ScreenNames.HOME_TAB, { isData: true });
     } else {
-      const dataArr = JSON.parse(transactionData);
-      dataArr.push(transactionDetails);
-      await AsyncStorage.setItem('transactionData', JSON.stringify(dataArr));
-      console.log('dataArr => ', dataArr);
+      console.log('something went wrong');
     }
-    navigation.navigate(ScreenNames.HOME_MAIN_SCREEN, { isData: true });
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');

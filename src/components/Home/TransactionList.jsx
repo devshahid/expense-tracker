@@ -10,7 +10,7 @@ const TransactionList = props => {
   const selectedDate = moment(date).format('DD-MMM');
   const { icon, color, backgroundColor } = getTransactionItem(category);
   const details =
-    isExpense === true
+    isExpense === true || isExpense === 1
       ? { sign: '-', color: Colours.RED_THEME }
       : { sign: '+', color: Colours.GREEN_THEME };
   return (
