@@ -1,26 +1,20 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Images, ScreenNames } from '../constants/constant';
 import client from '../utils/axios';
-const Login = ({ navigation }) => {
-  useEffect(() => {
-    GoogleSignin.configure({
-      androidClientId: __DEV__
-        ? process.env.ANDROID_CLIENT_ID
-        : process.env.ANDROID_RELEASE_CLIENT_ID,
-    });
-  }, []);
-
-  const correctDetails = {
-    email: 'shahid@gmail.com',
-    password: '123456',
-  };
+import ENV_VAR from '../config/config';
+const SignupScreen = ({ navigation }) => {
+  const { BACKEND_URL } = ENV_VAR;
   const [userDetails, setUserDetails] = useState({
+    name: '',
     email: '',
+    mobileNumber: '',
+    googleLoginId: '',
     password: '',
+    cpassword: '',
   });
   const handleFormData = (value, name) => {
     setUserDetails({
@@ -29,24 +23,22 @@ const Login = ({ navigation }) => {
     });
   };
   const handleSubmitData = async () => {
-    if (userDetails.email && userDetails.password) {
-      try {
-        const response = await client.post('/api/user/login', userDetails);
-        const { token, message } = response.data;
-        if (token) {
-          // store the token in the global store
-          await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-          await AsyncStorage.setItem('token', token);
-          navigation.replace(ScreenNames.MAIN_SCREEN);
-        } else {
-          console.log(message);
-        }
-      } catch (error) {
-        console.log(error);
+    console.log(userDetails, `${BACKEND_URL}`);
+    try {
+      const response = await client.post('/api/user/sign-up', userDetails);
+      console.log('response => ', response.data);
+      const { userData, status } = response.data;
+      console.log(typeof response.status, response.status === 201, status === true, userData._id);
+      if (response.status === 201 && status === true && userData._id) {
+        await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
+        // await AsyncStorage.setItem('userInfo', JSON.stringify(userData));
+        navigation.replace(ScreenNames.MAIN_SCREEN);
+      } else {
+        console.log('error matching');
       }
-    } else {
-      alert('Invalid User');
-      console.log('Invalid user');
+    } catch (error) {
+      // snackbar
+      console.log(error);
     }
   };
   const handleGoogleSignIn = async () => {
@@ -75,16 +67,24 @@ const Login = ({ navigation }) => {
     }
   };
   const handleNavigation = () => {
-    navigation.navigate(ScreenNames.SIGNUP_SCREEN);
+    navigation.navigate(ScreenNames.LOGIN_SCREEN);
   };
   return (
     <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="handled">
       <View style={styles.mainContainer}>
         <View>
-          <Image source={Images.LOGIN_IMAGE} style={styles.loginImage} />
+          <Image source={Images.SIGNUP_IMAGE} style={styles.loginImage} />
         </View>
         <View style={styles.labelContainer}>
           <View style={{ alignItems: 'center' }}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter you full name"
+              placeholderTextColor="#696969"
+              autoCapitalize="none"
+              value={userDetails.name}
+              onChangeText={value => handleFormData(value, 'name')}
+            />
             <TextInput
               style={styles.input}
               placeholder="Enter you email"
@@ -96,22 +96,33 @@ const Login = ({ navigation }) => {
             />
             <TextInput
               style={styles.input}
+              placeholder="Enter your mobile number"
+              placeholderTextColor="#696969"
+              keyboardType="numeric"
+              value={userDetails.mobileNumber}
+              onChangeText={value => handleFormData(value, 'mobileNumber')}
+            />
+            <TextInput
+              style={styles.input}
               placeholder="Enter your password"
               placeholderTextColor="#696969"
               secureTextEntry
               value={userDetails.password}
               onChangeText={value => handleFormData(value, 'password')}
             />
-          </View>
-          <View style={styles.forgotPsdContainer}>
-            <TouchableOpacity>
-              <Text style={styles.forgotPsdTxt}>Forgot Password?</Text>
-            </TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm your password"
+              placeholderTextColor="#696969"
+              secureTextEntry
+              value={userDetails.cpassword}
+              onChangeText={value => handleFormData(value, 'cpassword')}
+            />
           </View>
         </View>
 
         <TouchableOpacity style={styles.loginButton} onPress={handleSubmitData}>
-          <Text style={styles.loginButtonText}>Login</Text>
+          <Text style={styles.loginButtonText}>Sign Up</Text>
         </TouchableOpacity>
         <View style={styles.orContainer}>
           <View style={styles.horizontalDiv} />
@@ -124,9 +135,9 @@ const Login = ({ navigation }) => {
           <Text style={styles.loginWithGoogleText}>Login with Google</Text>
         </TouchableOpacity>
         <View style={styles.signupTextContainer}>
-          <Text style={styles.signUpMainText}>Don't have an account yet? </Text>
+          <Text style={styles.signUpMainText}>Already have an account? </Text>
           <TouchableOpacity onPress={handleNavigation}>
-            <Text style={styles.signupText}>Sign Up</Text>
+            <Text style={styles.signupText}>Login</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -134,7 +145,7 @@ const Login = ({ navigation }) => {
   );
 };
 
-export default Login;
+export default SignupScreen;
 
 const styles = StyleSheet.create({
   scrollContainer: {

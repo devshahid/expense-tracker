@@ -16,6 +16,7 @@ import { categoryOptions, paymentOptions } from '../constants/data';
 import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Colours, ScreenNames } from '../constants/constant';
+import client from '../utils/axios';
 
 const AddExpense = ({ navigation }) => {
   const [selectedBox, setSelectedBox] = useState('debit');
@@ -27,7 +28,7 @@ const AddExpense = ({ navigation }) => {
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [transactionDetails, setTransactionDetails] = useState({
     name: null,
-    amount: null,
+    amount: 0,
     paymentMode: 'Payment Mode',
     category: 'Select Category',
     date: formattedDate,
@@ -76,6 +77,9 @@ const AddExpense = ({ navigation }) => {
     setDatePickerVisibility(!isDatePickerVisible);
   };
   const handleSubmit = async () => {
+    const response = await client.post('/api/transactions/add-transactions', transactionDetails);
+    console.log(response.data, response.status);
+
     const transactionData = await AsyncStorage.getItem('transactionData');
     if (!transactionData) {
       const dataArr = [];
@@ -127,7 +131,7 @@ const AddExpense = ({ navigation }) => {
             placeholderTextColor={'#FCFCFC'}
             style={[styles.amountValue, { fontSize: 60, width: '100%' }]}
             keyboardType="numeric"
-            onChangeText={value => handleInputs(value, 'amount')}
+            onChangeText={value => handleInputs(Number(value), 'amount')}
           />
         </View>
       </View>
@@ -140,6 +144,7 @@ const AddExpense = ({ navigation }) => {
                 onChangeText={value => handleInputs(value, 'name')}
                 placeholder="Name"
                 placeholderTextColor={'grey'}
+                value={transactionDetails.name}
               />
             </View>
           </View>

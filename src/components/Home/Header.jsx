@@ -10,7 +10,7 @@ const HeaderComponent = () => {
     async function getUserInfo() {
       try {
         const userInfo = JSON.parse(await AsyncStorage.getItem('userInfo'));
-        if (userInfo.photo) {
+        if (userInfo?.photo) {
           setUserData(userInfo.photo);
         }
       } catch (error) {

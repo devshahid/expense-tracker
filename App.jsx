@@ -8,6 +8,8 @@ import OnboardingScreen from './src/screens/OnboardingScreen';
 import AddExpense from './src/screens/AddExpense';
 import LaunchScreen from './src/screens/LaunchScreen';
 import { ScreenNames } from './src/constants/constant';
+import SignupScreen from './src/screens/SignupScreen';
+
 const NativeStack = createNativeStackNavigator();
 function App() {
   return (
@@ -39,6 +41,11 @@ function App() {
           name={ScreenNames.ADD_EXPENSE_SCREEN}
           options={{ headerShown: false }}
           component={AddExpense}
+        />
+        <NativeStack.Screen
+          name={ScreenNames.SIGNUP_SCREEN}
+          options={{ headerShown: false }}
+          component={SignupScreen}
         />
       </NativeStack.Navigator>
     </NavigationContainer>

@@ -12,7 +12,7 @@ import TransactionView from '../../views/TransactionView';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { LineChart } from 'react-native-chart-kit';
 import Tabs from './Tabs';
-import { Colours } from '../../constants/constant';
+import { Colours, ScreenNames } from '../../constants/constant';
 
 const HomeMain = ({ navigation, route }) => {
   const [selectedTab, setSelectedTab] = useState('Today');
@@ -169,7 +169,7 @@ const HomeMain = ({ navigation, route }) => {
             name="plus"
             size={24}
             style={styles.addIcon}
-            onPress={() => navigation.navigate('Add_Expense')}
+            onPress={() => navigation.navigate(ScreenNames.ADD_EXPENSE_SCREEN)}
           />
         </TouchableOpacity>
       </View>

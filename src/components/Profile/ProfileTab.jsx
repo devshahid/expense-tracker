@@ -20,6 +20,7 @@ const ProfileTab = () => {
       await AsyncStorage.removeItem('isLoggedIn');
       await AsyncStorage.removeItem('userInfo');
       await AsyncStorage.removeItem('transactionData');
+      await AsyncStorage.removeItem('token');
       navigation.replace(ScreenNames.ON_BOARDING_SCREEN);
     } catch (error) {
       console.error(error);
