@@ -5,7 +5,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Images, ScreenNames } from '../constants/constant';
 import client from '../utils/axios';
+
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUserTokenAndId } from '../redux/slices/users';
 const Login = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const localState = useSelector(state => state.userDetails);
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__
@@ -14,10 +19,6 @@ const Login = ({ navigation }) => {
     });
   }, []);
 
-  const correctDetails = {
-    email: 'shahid@gmail.com',
-    password: '123456',
-  };
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
@@ -32,20 +33,21 @@ const Login = ({ navigation }) => {
     if (userDetails.email && userDetails.password) {
       try {
         const response = await client.post('/api/user/login', userDetails);
-        const { token, message } = response.data;
+        const { token, message, userId } = response.data;
         if (token) {
           // store the token in the global store
+          const data = { token, userId };
+          dispatch(updateUserTokenAndId(data));
           await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-          await AsyncStorage.setItem('token', token);
+          await AsyncStorage.setItem('userData', JSON.stringify(data));
           navigation.replace(ScreenNames.MAIN_SCREEN);
         } else {
-          console.log(message);
+          console.log('mymsg => ', message);
         }
       } catch (error) {
         console.log(error);
       }
     } else {
-      alert('Invalid User');
       console.log('Invalid user');
     }
   };
@@ -53,10 +55,21 @@ const Login = ({ navigation }) => {
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log('userInfo => ', userInfo);
-      if (userInfo) {
+      const userDetails = {
+        name: userInfo?.user?.name,
+        email: userInfo?.user?.email,
+        isGoogleLogin: true,
+        googleLoginId: userInfo?.user?.id,
+      };
+      const response = await client.post('/api/user/login', userDetails);
+      console.log('response => ', response.data);
+      const { token, userId } = response.data;
+      if (token) {
+        console.log('token => ', token, userId);
+        const data = { token, userId };
+        dispatch(updateUserTokenAndId(data));
         await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo.user));
+        await AsyncStorage.setItem('userData', JSON.stringify(data));
         navigation.replace(ScreenNames.MAIN_SCREEN);
       }
     } catch (error) {

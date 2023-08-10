@@ -13,8 +13,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { LineChart } from 'react-native-chart-kit';
 import Tabs from './Tabs';
 import { Colours, ScreenNames } from '../../constants/constant';
-
+import { useSelector } from 'react-redux';
 const HomeMain = ({ navigation, route }) => {
+  const localState = useSelector(state => state.userDetails);
   const [selectedTab, setSelectedTab] = useState('Today');
   const [graphLabels, setGraphLabels] = useState([
     '6AM-10AM',

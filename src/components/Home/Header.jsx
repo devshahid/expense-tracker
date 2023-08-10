@@ -19,10 +19,6 @@ const HeaderComponent = () => {
     }
     getUserInfo();
   }, []);
-  const showLocalData = async () => {
-    const transactionData = await AsyncStorage.getItem('transactionData');
-    console.log('transactionData value => ', transactionData);
-  };
   return (
     <View
       style={{
@@ -39,7 +35,7 @@ const HeaderComponent = () => {
         shadowOpacity: 0.4,
         shadowRadius: 2,
       }}>
-      <View style={styles.iconContainer} onPress={showLocalData}>
+      <View style={styles.iconContainer}>
         {userData ? (
           <Image source={{ uri: userData }} style={styles.userImage} />
         ) : (

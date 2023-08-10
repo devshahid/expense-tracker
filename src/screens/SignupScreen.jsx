@@ -31,7 +31,6 @@ const SignupScreen = ({ navigation }) => {
       console.log(typeof response.status, response.status === 201, status === true, userData._id);
       if (response.status === 201 && status === true && userData._id) {
         await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-        // await AsyncStorage.setItem('userInfo', JSON.stringify(userData));
         navigation.replace(ScreenNames.MAIN_SCREEN);
       } else {
         console.log('error matching');

@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react';
 import TransactionList from '../components/Home/TransactionList';
 import Icon from 'react-native-vector-icons/Entypo';
 import SQLite from '../sqlite/sql';
+import { useSelector } from 'react-redux';
 const TransactionView = ({ toggleTransaction, onRefreshComplete }) => {
+  const { userId } = useSelector(state => state.userDetails);
   const [dataArr, setDataArr] = useState([]);
   const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     async function getTransactionItems() {
-      const response = await SQLite.listAllTransactions();
+      const response = await SQLite.listAllTransactions(userId);
       console.log('data => ', response);
       setDataArr(response);
     }

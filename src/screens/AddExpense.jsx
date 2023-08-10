@@ -8,20 +8,23 @@ import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Colours, ScreenNames } from '../constants/constant';
 import SQLite from '../sqlite/sql';
+import { useSelector } from 'react-redux';
 const AddExpense = ({ navigation }) => {
+  const { userId } = useSelector(state => state.userDetails);
   const [selectedBox, setSelectedBox] = useState('debit');
   const [selectedHeaderTxt, setSelectedHeaderTxt] = useState('Expense');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const date = new Date();
+  const date = Date.now();
   const formattedDate = moment(date);
   const [selectedDate, setSelectedDate] = useState(moment(formattedDate).format('DD-MM-YYYY'));
-  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const [transactionDetails, setTransactionDetails] = useState({
+    userId: userId,
     name: null,
     amount: 0,
     paymentMode: 'Payment Mode',
     category: 'Select Category',
-    date: formattedDate,
+    date: moment(selectedDate, 'DD-MM-YYYY').toISOString(),
     isExpense: true,
   });
   const checkEmptyInput = value => {
@@ -29,8 +32,9 @@ const AddExpense = ({ navigation }) => {
     else return false;
   };
   useEffect(() => {
-    const { name, amount, paymentMode, category } = transactionDetails;
+    const { userId, name, amount, paymentMode, category } = transactionDetails;
     if (
+      checkEmptyInput(userId) &&
       checkEmptyInput(name) &&
       checkEmptyInput(amount) &&
       checkEmptyInput(paymentMode) &&
@@ -67,7 +71,11 @@ const AddExpense = ({ navigation }) => {
     setDatePickerVisibility(!isDatePickerVisible);
   };
   const handleSubmit = async () => {
-    const response = await SQLite.insertData(transactionDetails);
+    const isoDate = moment(selectedDate, 'DD-MM-YYYY').toISOString();
+    const newData = { ...transactionDetails, date: isoDate };
+    console.log('newData => ', newData);
+    const response = await SQLite.insertData(newData);
+    console.log('response => ', response);
     if (response == 1) {
       navigation.navigate(ScreenNames.HOME_TAB, { isData: true });
     } else {
