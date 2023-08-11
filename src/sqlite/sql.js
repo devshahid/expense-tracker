@@ -42,6 +42,7 @@ class SQL {
     });
   }
   listAllTransactions(userId) {
+    console.log('user id => ', userId);
     return new Promise((resolve, reject) => {
       db.transaction(txn => {
         txn.executeSql(

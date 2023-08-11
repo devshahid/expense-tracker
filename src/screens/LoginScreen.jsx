@@ -5,12 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Images, ScreenNames } from '../constants/constant';
 import client from '../utils/axios';
-
+import Snackbar from 'react-native-snackbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUserTokenAndId } from '../redux/slices/users';
-const Login = ({ navigation }) => {
+const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const localState = useSelector(state => state.userDetails);
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__
@@ -18,6 +17,21 @@ const Login = ({ navigation }) => {
         : process.env.ANDROID_RELEASE_CLIENT_ID,
     });
   }, []);
+
+  useEffect(() => {
+    if (route?.params?.success) {
+      Snackbar.show({
+        text: 'REGISTRATION SUCCESSFULL',
+        duration: Snackbar.LENGTH_LONG,
+        marginBottom: 20,
+        backgroundColor: '#3AC279',
+        textColor: '#000000',
+      });
+      setTimeout(() => {
+        Snackbar.dismiss();
+      }, 3000);
+    }
+  }, [route.params]);
 
   const [userDetails, setUserDetails] = useState({
     email: '',

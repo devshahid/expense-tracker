@@ -17,7 +17,6 @@ export const userDetailSlice = createSlice({
         userId: userId,
       };
     },
-    deleteToken: state => {},
   },
 });
 
