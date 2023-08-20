@@ -4,7 +4,7 @@ export const paymentOptions = [
   { value: 'Paytm' },
   { value: 'Amazon Pay' },
   { value: 'Cash' },
-  { value: 'Other' },
+  { value: 'Net Banking' },
 ];
 export const categoryOptions = [
   { value: 'Food' },

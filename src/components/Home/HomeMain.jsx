@@ -167,13 +167,10 @@ const HomeMain = ({ navigation, route }) => {
         </View>
       </ScrollView>
       <View id="add_expense_container" style={styles.addExpContainer}>
-        <TouchableOpacity style={styles.iconBtn}>
-          <Icon
-            name="plus"
-            size={24}
-            style={styles.addIcon}
-            onPress={() => navigation.navigate(ScreenNames.ADD_EXPENSE_SCREEN)}
-          />
+        <TouchableOpacity
+          style={styles.iconBtn}
+          onPress={() => navigation.navigate(ScreenNames.ADD_EXPENSE_SCREEN)}>
+          <Icon name="plus" size={24} style={styles.addIcon} />
         </TouchableOpacity>
       </View>
     </>

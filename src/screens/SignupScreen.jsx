@@ -24,9 +24,7 @@ const SignupScreen = ({ navigation }) => {
   const handleSubmitData = async () => {
     try {
       const response = await client.post('/api/user/sign-up', userDetails);
-      console.log('response => ', response.data);
       const { userData, status } = response.data;
-      console.log(typeof response.status, response.status === 201, status === true, userData._id);
       if (response.status === 201 && status === true && userData._id) {
         // await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
         navigation.replace(ScreenNames.LOGIN_SCREEN, { success: true });
