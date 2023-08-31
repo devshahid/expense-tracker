@@ -12,10 +12,13 @@ import TransactionView from '../../views/TransactionView';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { LineChart } from 'react-native-chart-kit';
 import Tabs from './Tabs';
-import { Colours, ScreenNames } from '../../constants/constant';
-import { useSelector } from 'react-redux';
+import { Colours, ScreenNames, tableNames } from '../../constants/constant';
+import { useDispatch, useSelector } from 'react-redux';
+import SQLite from '../../sqlite/sql';
+import { updateAmountDetails } from '../../redux/slices/users';
 const HomeMain = ({ navigation, route }) => {
-  const localState = useSelector(state => state.userDetails);
+  const globalState = useSelector(state => state.userDetails);
+  const dispatch = useDispatch();
   const [selectedTab, setSelectedTab] = useState('Today');
   const [graphLabels, setGraphLabels] = useState([
     '6AM-10AM',
@@ -27,6 +30,25 @@ const HomeMain = ({ navigation, route }) => {
   const [graphData, setGraphData] = useState([10, 15, 20, 12, 50]);
   const [refreshing, setRefreshing] = useState(false);
   const [toggleTransaction, setToggleTransaction] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
+  useEffect(() => {
+    async function getUserData() {
+      try {
+        if (globalState.userId) {
+          SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, globalState.userId);
+          const userData = await SQLite.fetchTableData(tableNames.USER_TABLE, globalState.userId);
+          const data = { bankAmount: userData.bankAmount, cashAmount: userData.cashAmount };
+          dispatch(updateAmountDetails(data));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getUserData();
+  }, []);
+  useEffect(() => {
+    setTotalAmount(Number(globalState.cashAmount) + Number(globalState.bankAmount));
+  }, [globalState.bankAmount, globalState.cashAmount]);
   useEffect(() => {
     if (selectedTab === 'Today') {
       setGraphLabels(['6AM-10AM', '10AM-2PM', '2PM-6PM', '6PM-10PM', '10PM-2AM']);
@@ -69,6 +91,7 @@ const HomeMain = ({ navigation, route }) => {
     setTimeout(() => {
       setRefreshing(false);
       setToggleTransaction(!toggleTransaction);
+      setTotalAmount(Number(globalState.bankAmount) + Number(globalState.cashAmount));
     }, 2000);
   });
   return (
@@ -76,7 +99,7 @@ const HomeMain = ({ navigation, route }) => {
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View style={{ flex: 1, marginHorizontal: 5, backgroundColor: Colours.WHITE_PURE }}>
           <View style={styles.balanceContainer}>
-            <Text style={styles.balanceStyle}>₹ 0</Text>
+            <Text style={styles.balanceStyle}>₹ {totalAmount}</Text>
           </View>
           <View style={styles.incomeExpMainContainer}>
             <View style={[styles.incomeExpContainer, { backgroundColor: Colours.GREEN_THEME }]}>

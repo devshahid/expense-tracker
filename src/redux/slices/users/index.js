@@ -2,6 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   token: null,
   userId: null,
+  bankAmount: 0,
+  cashAmount: 0,
 };
 
 export const userDetailSlice = createSlice({
@@ -10,16 +12,22 @@ export const userDetailSlice = createSlice({
   reducers: {
     updateUserTokenAndId: (state, action) => {
       const { token, userId } = action.payload;
-      console.log('action => ', token, userId);
       return {
         ...state,
         token: token,
         userId: userId,
       };
     },
+    updateAmountDetails: (state, action) => {
+      const { bankAmount, cashAmount } = action.payload;
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
   },
 });
 
-export const { updateUserTokenAndId, deleteToken } = userDetailSlice.actions;
+export const { updateUserTokenAndId, updateAmountDetails } = userDetailSlice.actions;
 
 export default userDetailSlice.reducer;

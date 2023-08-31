@@ -1,12 +1,17 @@
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Colours, ScreenNames } from '../../constants/constant';
-
+import ProfileMainCard from './ProfileMainCard';
+import ProfileItems from './ProfileItems';
+import { ScrollView } from 'react-native';
+import Logout from './Logout';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import AddBalance from './AddBalance';
 const ProfileTab = () => {
   const navigation = useNavigation();
+  const [logout, setLogout] = useState(false);
+  const [addBalance, setAddBalance] = useState(false);
+
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__
@@ -14,26 +19,19 @@ const ProfileTab = () => {
         : process.env.ANDROID_RELEASE_CLIENT_ID,
     });
   }, []);
-  const handleLogout = async () => {
-    try {
-      await GoogleSignin.signOut();
-      await AsyncStorage.removeItem('isLoggedIn');
-      await AsyncStorage.removeItem('userInfo');
-      await AsyncStorage.removeItem('token');
-      navigation.replace(ScreenNames.ON_BOARDING_SCREEN);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.profileContainerView}>
-        <Text style={{ color: Colours.BLACK }}>Profile Screen</Text>
-      </View>
-      <View style={styles.profileContainerView}>
-        <TouchableOpacity style={styles.LogoutBtnContainer} onPress={handleLogout}>
-          <Text style={styles.LogoutBtn}>Log Out</Text>
-        </TouchableOpacity>
+      <ProfileMainCard />
+      <View style={{ height: '100%', padding: 10 }}>
+        <ScrollView>
+          <ProfileItems name="Add Balance" iconName="wallet" handler={() => setAddBalance(true)} />
+          <ProfileItems name="Settings" iconName="settings" />
+          <ProfileItems name="Export Data" iconName="share" />
+          <ProfileItems name="Log Out" iconName="log-out" handler={() => setLogout(true)} />
+        </ScrollView>
+        <Logout state={logout} setLogout={setLogout} navigation={navigation} />
+        <AddBalance state={addBalance} setAddBalance={setAddBalance} navigation={navigation} />
       </View>
     </View>
   );
@@ -42,23 +40,5 @@ const ProfileTab = () => {
 export default ProfileTab;
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  profileContainerView: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-  },
-  LogoutBtnContainer: {
-    justifyContent: 'flex-end',
-    backgroundColor: '#FD3C4A',
-    borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    marginTop: 20,
-    width: '80%',
-    alignItems: 'center',
-    elevation: 1,
-    marginBottom: 20,
-  },
-  LogoutBtn: { color: Colours.WHITE_PURE, fontSize: 16, fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: '#F6F6F6' },
 });
