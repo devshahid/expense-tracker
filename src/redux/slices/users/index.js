@@ -4,6 +4,8 @@ const initialState = {
   userId: null,
   bankAmount: 0,
   cashAmount: 0,
+  incomeBal: 50,
+  expenseBal: 90,
 };
 
 export const userDetailSlice = createSlice({
@@ -19,15 +21,24 @@ export const userDetailSlice = createSlice({
       };
     },
     updateAmountDetails: (state, action) => {
-      const { bankAmount, cashAmount } = action.payload;
       return {
         ...state,
         ...action.payload,
       };
     },
+    updateIncomeAndExpense: (state, action) => {
+      const { expense, income } = action.payload;
+      console.log('action.payload => ', action.payload);
+      return {
+        ...state,
+        incomeBal: income,
+        expenseBal: expense,
+      };
+    },
   },
 });
 
-export const { updateUserTokenAndId, updateAmountDetails } = userDetailSlice.actions;
+export const { updateUserTokenAndId, updateAmountDetails, updateIncomeAndExpense } =
+  userDetailSlice.actions;
 
 export default userDetailSlice.reducer;

@@ -57,4 +57,5 @@ export const onboardingSlides = [
 
 export const tableNames = {
   USER_TABLE: 'userdetails',
+  TRANSACTION_TABLE: 'transactions',
 };

@@ -1,21 +1,9 @@
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import TransactionList from '../components/Home/TransactionList';
 import Icon from 'react-native-vector-icons/Entypo';
-import SQLite from '../sqlite/sql';
-import { useSelector } from 'react-redux';
-const TransactionView = ({ toggleTransaction, onRefreshComplete }) => {
-  const { userId } = useSelector(state => state.userDetails);
-  const [dataArr, setDataArr] = useState([]);
+const TransactionView = ({ dataArr }) => {
   const [showModal, setShowModal] = useState(false);
-  useEffect(() => {
-    async function getTransactionItems() {
-      const response = await SQLite.listAllTransactions(userId);
-      console.log('data => ', response);
-      setDataArr(response);
-    }
-    getTransactionItems();
-  }, [showModal, onRefreshComplete]);
   return (
     <View>
       <View style={[styles.recentContainer, { marginHorizontal: 5 }]}>

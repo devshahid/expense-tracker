@@ -111,7 +111,6 @@ class SQL {
               tableNames.push(results.rows.item(i).name);
             }
             resolve(tableNames);
-            // res.rowsAffected ? resolve(res.rowsAffected) : 'no rows affected';
           },
           (tx, error) => {
             console.log('error => ', error);

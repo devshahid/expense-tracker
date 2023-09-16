@@ -6,7 +6,7 @@ import moment from 'moment';
 import { categoryOptions, paymentOptions } from '../constants/data';
 import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { Colours, ScreenNames } from '../constants/constant';
+import { Colours, ScreenNames, tableNames } from '../constants/constant';
 import SQLite from '../sqlite/sql';
 import { useSelector } from 'react-redux';
 const AddExpense = ({ navigation }) => {
@@ -75,6 +75,7 @@ const AddExpense = ({ navigation }) => {
     const newData = { ...transactionDetails, date: isoDate };
     console.log('newData => ', newData);
     const response = await SQLite.insertData(newData);
+    // await SQLite.updateUserDetails(tableNames.USER_TABLE, {userId : transactionDetails.userId, bankAmount: 0, cashAmount :0 })
     console.log('response => ', response);
     if (response == 1) {
       navigation.navigate(ScreenNames.HOME_TAB, { isData: true });

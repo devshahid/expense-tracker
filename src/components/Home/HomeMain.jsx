@@ -15,10 +15,13 @@ import Tabs from './Tabs';
 import { Colours, ScreenNames, tableNames } from '../../constants/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import SQLite from '../../sqlite/sql';
-import { updateAmountDetails } from '../../redux/slices/users';
+import { updateAmountDetails, updateIncomeAndExpense } from '../../redux/slices/users';
+import { updateTransactions } from '../../redux/slices/transactions';
+import moment from 'moment';
 const HomeMain = ({ navigation, route }) => {
-  const globalState = useSelector(state => state.userDetails);
   const dispatch = useDispatch();
+  const globalState = useSelector(state => state.userDetails);
+  const { transactionList } = useSelector(state => state.transactions);
   const [selectedTab, setSelectedTab] = useState('Today');
   const [graphLabels, setGraphLabels] = useState([
     '6AM-10AM',
@@ -32,12 +35,38 @@ const HomeMain = ({ navigation, route }) => {
   const [toggleTransaction, setToggleTransaction] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
   useEffect(() => {
+    const currMonth = moment().format('MM');
+    let income = 0;
+    let expense = 0;
+    transactionList.map(item => {
+      const month = moment(item.date).format('MM');
+      if (month === currMonth) {
+        if (item.isExpense === 0) {
+          income += Number(item.amount);
+        } else if (item.isExpense === 1) {
+          expense += Number(item.amount);
+        }
+      }
+    });
+    dispatch(updateIncomeAndExpense({ income, expense }));
+  }, [transactionList]);
+  useEffect(() => {
+    const getTransactionList = async () => {
+      const response = await SQLite.listAllTransactions(globalState.userId);
+      dispatch(updateTransactions(response));
+    };
+    getTransactionList();
+  }, [toggleTransaction]);
+  useEffect(() => {
     async function getUserData() {
       try {
         if (globalState.userId) {
           SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, globalState.userId);
           const userData = await SQLite.fetchTableData(tableNames.USER_TABLE, globalState.userId);
-          const data = { bankAmount: userData.bankAmount, cashAmount: userData.cashAmount };
+          const data = {
+            bankAmount: userData.bankAmount ?? 0,
+            cashAmount: userData.cashAmount ?? 0,
+          };
           dispatch(updateAmountDetails(data));
         }
       } catch (error) {
@@ -108,7 +137,7 @@ const HomeMain = ({ navigation, route }) => {
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Income</Text>
-                <Text style={styles.incomeExpAmount}>₹ 0</Text>
+                <Text style={styles.incomeExpAmount}>₹ {globalState.incomeBal}</Text>
               </View>
             </View>
             <View style={[styles.incomeExpContainer, { backgroundColor: Colours.RED_THEME }]}>
@@ -117,7 +146,7 @@ const HomeMain = ({ navigation, route }) => {
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Expense</Text>
-                <Text style={styles.incomeExpAmount}>₹ 0</Text>
+                <Text style={styles.incomeExpAmount}>₹ {globalState.expenseBal}</Text>
               </View>
             </View>
           </View>
@@ -185,6 +214,7 @@ const HomeMain = ({ navigation, route }) => {
             route={route}
             navigation={navigation}
             toggleTransaction={toggleTransaction}
+            dataArr={transactionList}
             onRefreshComplete={onRefresh}
           />
         </View>

@@ -3,9 +3,12 @@ import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native';
-import { Colours, Images } from '../../constants/constant';
+import { Colours, Images, tableNames } from '../../constants/constant';
+import SQLite from '../../sqlite/sql';
+import { useSelector } from 'react-redux';
 const HeaderComponent = () => {
   const [userData, setUserData] = useState(null);
+  const globalState = useSelector(state => state.userDetails);
   useEffect(() => {
     async function getUserInfo() {
       try {
@@ -52,7 +55,11 @@ const HeaderComponent = () => {
           Total Balance
         </Text>
       </TouchableOpacity>
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={async () => {
+          console.log(await SQLite.getAllTables());
+          console.log(await SQLite.getTableData(tableNames.TRANSACTION_TABLE, globalState.userId));
+        }}>
         <Icon name="bell" size={30} style={{ color: Colours.PURPLE_THEME }} />
       </TouchableOpacity>
     </View>
