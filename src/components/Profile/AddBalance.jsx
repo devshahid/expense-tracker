@@ -22,6 +22,10 @@ const AddBalance = ({ state, setAddBalance }) => {
       setAddBalance(false);
     }
     return () => {
+      setAmountDetails({
+        select: 'Bank',
+        amount: 0,
+      });
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
     };
   }, [dispatch, transactionAdded]);

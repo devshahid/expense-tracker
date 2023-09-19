@@ -1,17 +1,15 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Images, ScreenNames } from '../constants/constant';
-import client from '../utils/axios';
 import Snackbar from 'react-native-snackbar';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUserTokenAndId, userLogin } from '../redux/slices/users';
+import { userLogin } from '../redux/slices/users';
 import DotsAnimation from '../components/Loaders/DotLoader';
 const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { token, userId, isLoading } = useSelector(state => state.userDetails);
+  const { token, isLoading } = useSelector(state => state.userDetails);
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__

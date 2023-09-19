@@ -7,12 +7,12 @@ import { categoryOptions, paymentOptions } from '../constants/data';
 import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Colours, ScreenNames, tableNames } from '../constants/constant';
-import SQLite from '../sqlite/sql';
+import Snackbar from 'react-native-snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
 const AddExpense = ({ navigation }) => {
   const { userId } = useSelector(state => state.userDetails);
-  const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal } = useSelector(
+  const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message } = useSelector(
     state => state.transactions,
   );
   const dispatch = useDispatch();
@@ -52,13 +52,24 @@ const AddExpense = ({ navigation }) => {
     }
   }, [transactionDetails]);
   useEffect(() => {
-    if (transactionAdded) {
+    if (message) {
+      Snackbar.show({
+        text: message,
+        duration: Snackbar.LENGTH_LONG,
+        marginBottom: 20,
+        backgroundColor: '#3AC279',
+        textColor: '#000000',
+      });
+      setTimeout(() => {
+        Snackbar.dismiss();
+      }, 5000);
+    } else if (transactionAdded) {
       navigation.navigate(ScreenNames.HOME_TAB, { isData: true });
     }
     return () => {
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
     };
-  }, [dispatch, transactionAdded]);
+  }, [dispatch, transactionAdded, message]);
   const handleInputs = (value, name) => {
     setTransactionDetails({
       ...transactionDetails,

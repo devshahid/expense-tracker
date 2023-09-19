@@ -113,3 +113,7 @@ export const transactionItems = {
 export const getTransactionItem = category => {
   return { ...transactionItems[category] };
 };
+
+export const checkPaymentMode = payMode => {
+  return paymentOptions.find(item => item.value === payMode);
+};
