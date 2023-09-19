@@ -1,11 +1,10 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
-import Modal from 'react-native-modal';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScreenNames } from '../../constants/constant';
 import { useDispatch } from 'react-redux';
 import { userLogout } from '../../redux/slices/users';
+import ProfileModal from '../Modal/ProfileModal';
 
 const Logout = ({ state, setLogout, navigation }) => {
   const dispatch = useDispatch();
@@ -19,38 +18,26 @@ const Logout = ({ state, setLogout, navigation }) => {
     }
   };
   return (
-    <View>
-      <Modal isVisible={state}>
-        <View style={styles.logoutModalContainer}>
-          <Text style={styles.logOutTitle}>Log Out?</Text>
-          <Text style={styles.logOutDesc}>Are you sure you want to logout?</Text>
-          <View style={styles.confirmBtnContainer}>
-            <TouchableOpacity onPress={() => setLogout(false)}>
-              <Text style={styles.confirmBtnTxt}>No</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleLogout}>
-              <Text
-                style={[styles.confirmBtnTxt, { backgroundColor: '#7F3DFF', color: '#FFFFFF' }]}>
-                Yes
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </View>
+    <ProfileModal state={state} setState={setLogout}>
+      <Text style={styles.logOutTitle}>Log Out?</Text>
+      <Text style={styles.logOutDesc}>Are you sure you want to logout?</Text>
+      <View style={styles.confirmBtnContainer}>
+        <TouchableOpacity onPress={() => setLogout(false)}>
+          <Text style={styles.confirmBtnTxt}>No</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={[styles.confirmBtnTxt, { backgroundColor: '#7F3DFF', color: '#FFFFFF' }]}>
+            Yes
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ProfileModal>
   );
 };
 
 export default Logout;
 
 const styles = StyleSheet.create({
-  logoutModalContainer: {
-    backgroundColor: '#ffffff',
-    minHeight: 200,
-    alignItems: 'center',
-    padding: 20,
-    borderRadius: 20,
-  },
   logOutTitle: {
     fontSize: 20,
     color: '#000000',
