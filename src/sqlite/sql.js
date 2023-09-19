@@ -185,30 +185,6 @@ class SQL {
       });
     });
   }
-  async fetchTableData(tableName, userId) {
-    return new Promise((resolve, reject) => {
-      db.transaction(txn => {
-        txn.executeSql(
-          `SELECT * FROM ${tableName} WHERE userId = ? ORDER BY id DESC`,
-          [userId],
-          (tx, res) => {
-            const tempArr = [];
-            for (let i = 0; i < res.rows.length; ++i) {
-              tempArr.push(res.rows.item(i));
-            }
-            if (tempArr.length > 0) {
-              resolve(...tempArr);
-            } else {
-              resolve({ message: 'No data found' });
-            }
-          },
-          (tx, error) => {
-            reject(error);
-          },
-        );
-      });
-    });
-  }
 }
 
 export default SQLite = new SQL();

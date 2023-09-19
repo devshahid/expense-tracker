@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserTransactions } from '../../redux/slices/transactions';
 const HomeMain = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { userId, token } = useSelector(state => state.userDetails);
+  const { userId } = useSelector(state => state.userDetails);
   const { transactionList, bankAmount, cashAmount, incomeBal, expenseBal } = useSelector(
     state => state.transactions,
   );

@@ -1,12 +1,11 @@
 import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import React, { useState } from 'react';
-import Modal from 'react-native-modal';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Colours } from '../../constants/constant';
 import { Picker } from '@react-native-picker/picker';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { resetTransactionAdded, updateUserAmount } from '../../redux/slices/transactions';
+import ProfileModal from '../Modal/ProfileModal';
 
 const AddBalance = ({ state, setAddBalance }) => {
   const dispatch = useDispatch();
@@ -22,6 +21,10 @@ const AddBalance = ({ state, setAddBalance }) => {
       setAddBalance(false);
     }
     return () => {
+      setAmountDetails({
+        select: 'Bank',
+        amount: 0,
+      });
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
     };
   }, [dispatch, transactionAdded]);
@@ -46,55 +49,38 @@ const AddBalance = ({ state, setAddBalance }) => {
     dispatch(updateUserAmount(newObj));
   };
   return (
-    <View>
-      <Modal isVisible={state}>
-        <View style={styles.logoutModalContainer}>
-          <TouchableOpacity onPress={() => setAddBalance(false)} style={styles.xmarkContainer}>
-            <Icon name="cancel" size={40} style={{ color: '#000000' }} />
-          </TouchableOpacity>
-          <Text style={styles.balanceTitle}>Amount Details</Text>
+    <ProfileModal state={state} setState={setAddBalance}>
+      <Text style={styles.balanceTitle}>Amount Details</Text>
+      <TextInput
+        placeholder="Enter amount to Add"
+        placeholderTextColor={'#000000'}
+        style={[styles.amountValue]}
+        keyboardType="numeric"
+        onChangeText={value => handleInputs(Number(value), 'amount')}
+      />
+      <View style={styles.pickerViewContainer}>
+        <Picker
+          style={styles.pickerContainer}
+          selectedValue={amountDetails.select}
+          onValueChange={option => {
+            handleInputs(option, 'select');
+          }}
+          dropdownIconColor="#000000">
+          <Picker.Item label="Bank" value="Bank" style={{}} />
+          <Picker.Item label="Cash" value="Cash" />
+        </Picker>
+      </View>
 
-          <TextInput
-            placeholder="Enter amount to Add"
-            placeholderTextColor={'#000000'}
-            style={[styles.amountValue]}
-            keyboardType="numeric"
-            onChangeText={value => handleInputs(Number(value), 'amount')}
-          />
-          <View style={styles.pickerViewContainer}>
-            <Picker
-              style={styles.pickerContainer}
-              selectedValue={amountDetails.select}
-              onValueChange={option => {
-                handleInputs(option, 'select');
-              }}
-              dropdownIconColor="#000000">
-              <Picker.Item label="Bank" value="Bank" style={{}} />
-              <Picker.Item label="Cash" value="Cash" />
-            </Picker>
-          </View>
-
-          <TouchableOpacity style={styles.submitBtn} onPress={handleSubmitBtn}>
-            <Text style={styles.submitBtnTxt}>Submit</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    </View>
+      <TouchableOpacity style={styles.submitBtn} onPress={handleSubmitBtn}>
+        <Text style={styles.submitBtnTxt}>Submit</Text>
+      </TouchableOpacity>
+    </ProfileModal>
   );
 };
 
 export default AddBalance;
 
 const styles = StyleSheet.create({
-  logoutModalContainer: {
-    position: 'relative',
-    backgroundColor: '#ffffff',
-    minHeight: 400,
-    alignItems: 'center',
-    padding: 20,
-    borderRadius: 20,
-    gap: 10,
-  },
   balanceTitle: {
     color: '#000000',
     fontSize: 22,
@@ -114,10 +100,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
   },
-  xmarkContainer: {
-    position: 'absolute',
-    right: 0,
-  },
+
   submitBtn: {
     width: '100%',
     justifyContent: 'center',

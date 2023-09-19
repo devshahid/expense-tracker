@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import ProfileMainCard from './ProfileMainCard';
 import ProfileItems from './ProfileItems';
-import { ScrollView } from 'react-native';
 import Logout from './Logout';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AddBalance from './AddBalance';
