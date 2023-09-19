@@ -10,8 +10,8 @@ import { resetTransactionAdded, updateUserAmount } from '../../redux/slices/tran
 
 const AddBalance = ({ state, setAddBalance }) => {
   const dispatch = useDispatch();
-  const { userId, bankAmount, cashAmount } = useSelector(state => state.userDetails);
-  const { transactionAdded } = useSelector(state => state.transactions);
+  const { userId } = useSelector(state => state.userDetails);
+  const { transactionAdded, bankAmount, cashAmount } = useSelector(state => state.transactions);
   const [amountDetails, setAmountDetails] = useState({
     select: 'Bank',
     amount: 0,
