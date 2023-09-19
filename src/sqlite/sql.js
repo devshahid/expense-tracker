@@ -64,7 +64,7 @@ class SQL {
           `INSERT INTO ${table}(userId, name, amount, paymentMode, category, date, isExpense, isSynced) VALUES(?,?,?,?,?,?,?,?)`,
           [userId, name, String(amount), paymentMode, category, date, isExpense, false],
           (tx, res) => {
-            res.rowsAffected ? resolve(res.rowsAffected) : 'no rows affected';
+            res.rowsAffected ? resolve(res.rowsAffected) : resolve({ message: 'no rows affected' });
           },
           (tx, error) => {
             console.log('error => ', error);
@@ -75,7 +75,6 @@ class SQL {
     });
   }
   listAllTransactions(userId) {
-    console.log('user id => ', userId);
     return new Promise((resolve, reject) => {
       db.transaction(txn => {
         txn.executeSql(
@@ -123,7 +122,6 @@ class SQL {
 
   async updateUserDetails(tableName, { userId, bankAmount, cashAmount }) {
     return new Promise((resolve, reject) => {
-      console.log(tableName, userId, bankAmount, cashAmount);
       let updateQuery = `UPDATE ${tableName} SET `;
       const params = [];
 
@@ -142,7 +140,6 @@ class SQL {
 
       updateQuery += ' WHERE userId = ?';
       params.push(userId);
-      console.log(updateQuery);
       db.transaction(tx => {
         tx.executeSql(
           updateQuery,
@@ -168,7 +165,7 @@ class SQL {
     return new Promise((resolve, reject) => {
       db.transaction(txn => {
         txn.executeSql(
-          `SELECT * FROM ${tableName} WHERE userId = ? ORDER BY id DESC`,
+          `SELECT * FROM ${tableName} WHERE userId = ? ORDER BY id ASC`,
           [userId],
           (tx, res) => {
             const tempArr = [];

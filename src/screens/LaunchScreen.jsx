@@ -9,9 +9,12 @@ const LaunchScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     async function getItems() {
-      const status = await AsyncStorage.getItem('isLoggedIn');
-      if (JSON.parse(status)) {
-        const data = JSON.parse(await AsyncStorage.getItem('userData'));
+      const userData = await AsyncStorage.getItem('userData');
+      const data = JSON.parse(userData);
+      console.log('data => ', data);
+      if (data) {
+        // write logic to fetch data from database and update the state
+        // const data = JSON.parse(await AsyncStorage.getItem('userData'));
         dispatch(updateUserTokenAndId(data));
         navigation.replace(ScreenNames.MAIN_SCREEN);
       } else {

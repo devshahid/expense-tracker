@@ -18,6 +18,7 @@ const TransactionView = ({ dataArr }) => {
         {dataArr.length > 0 ? (
           dataArr
             .slice(0, 10)
+            .reverse()
             .map((element, i) => (
               <TransactionList
                 key={i}
@@ -55,16 +56,18 @@ const TransactionView = ({ dataArr }) => {
         </View>
         <ScrollView>
           {dataArr.length > 0 &&
-            dataArr.map((element, i) => (
-              <TransactionList
-                key={i}
-                name={element.name}
-                category={element.category}
-                amount={element.amount}
-                date={element.date}
-                isExpense={element.isExpense}
-              />
-            ))}
+            [...dataArr]
+              .reverse()
+              .map((element, i) => (
+                <TransactionList
+                  key={i}
+                  name={element.name}
+                  category={element.category}
+                  amount={element.amount}
+                  date={element.date}
+                  isExpense={element.isExpense}
+                />
+              ))}
         </ScrollView>
       </Modal>
     </View>

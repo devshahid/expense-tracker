@@ -12,7 +12,7 @@ const HeaderComponent = () => {
   useEffect(() => {
     async function getUserInfo() {
       try {
-        const userInfo = JSON.parse(await AsyncStorage.getItem('userInfo'));
+        const userInfo = JSON.parse(await AsyncStorage.getItem('userData'));
         if (userInfo?.photo) {
           setUserData(userInfo.photo);
         }
@@ -56,10 +56,11 @@ const HeaderComponent = () => {
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={async () => {
-          console.log(await SQLite.getAllTables());
-          console.log(await SQLite.getTableData(tableNames.TRANSACTION_TABLE, globalState.userId));
-        }}>
+        onPress={async () => [
+          console.log(await SQLite.getAllTables()),
+          console.log(await SQLite.getTableData(tableNames.TRANSACTION_TABLE, globalState.userId)),
+          console.log(await SQLite.getTableData(tableNames.USER_TABLE, globalState.userId)),
+        ]}>
         <Icon name="bell" size={30} style={{ color: Colours.PURPLE_THEME }} />
       </TouchableOpacity>
     </View>

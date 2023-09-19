@@ -12,16 +12,15 @@ import TransactionView from '../../views/TransactionView';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { LineChart } from 'react-native-chart-kit';
 import Tabs from './Tabs';
-import { Colours, ScreenNames, tableNames } from '../../constants/constant';
+import { Colours, ScreenNames } from '../../constants/constant';
 import { useDispatch, useSelector } from 'react-redux';
-import SQLite from '../../sqlite/sql';
-import { updateAmountDetails, updateIncomeAndExpense } from '../../redux/slices/users';
-import { updateTransactions } from '../../redux/slices/transactions';
-import moment from 'moment';
+import { getUserTransactions } from '../../redux/slices/transactions';
 const HomeMain = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const globalState = useSelector(state => state.userDetails);
-  const { transactionList } = useSelector(state => state.transactions);
+  const { userId, token } = useSelector(state => state.userDetails);
+  const { transactionList, bankAmount, cashAmount, incomeBal, expenseBal } = useSelector(
+    state => state.transactions,
+  );
   const [selectedTab, setSelectedTab] = useState('Today');
   const [graphLabels, setGraphLabels] = useState([
     '6AM-10AM',
@@ -35,49 +34,13 @@ const HomeMain = ({ navigation, route }) => {
   const [toggleTransaction, setToggleTransaction] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
   useEffect(() => {
-    const currMonth = moment().format('MM');
-    let income = 0;
-    let expense = 0;
-    transactionList.map(item => {
-      const month = moment(item.date).format('MM');
-      if (month === currMonth) {
-        if (item.isExpense === 0) {
-          income += Number(item.amount);
-        } else if (item.isExpense === 1) {
-          expense += Number(item.amount);
-        }
-      }
-    });
-    dispatch(updateIncomeAndExpense({ income, expense }));
-  }, [transactionList]);
-  useEffect(() => {
-    const getTransactionList = async () => {
-      const response = await SQLite.listAllTransactions(globalState.userId);
-      dispatch(updateTransactions(response));
-    };
-    getTransactionList();
-  }, [toggleTransaction]);
-  useEffect(() => {
-    async function getUserData() {
-      try {
-        if (globalState.userId) {
-          SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, globalState.userId);
-          const userData = await SQLite.fetchTableData(tableNames.USER_TABLE, globalState.userId);
-          const data = {
-            bankAmount: userData.bankAmount ?? 0,
-            cashAmount: userData.cashAmount ?? 0,
-          };
-          dispatch(updateAmountDetails(data));
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getUserData();
+    // dispatch action to read data from db for transaction list and income expense
+    dispatch(getUserTransactions(userId));
   }, []);
+
   useEffect(() => {
-    setTotalAmount(Number(globalState.cashAmount) + Number(globalState.bankAmount));
-  }, [globalState.bankAmount, globalState.cashAmount]);
+    setTotalAmount(Number(cashAmount) + Number(bankAmount));
+  }, [bankAmount, cashAmount]);
   useEffect(() => {
     if (selectedTab === 'Today') {
       setGraphLabels(['6AM-10AM', '10AM-2PM', '2PM-6PM', '6PM-10PM', '10PM-2AM']);
@@ -120,7 +83,6 @@ const HomeMain = ({ navigation, route }) => {
     setTimeout(() => {
       setRefreshing(false);
       setToggleTransaction(!toggleTransaction);
-      setTotalAmount(Number(globalState.bankAmount) + Number(globalState.cashAmount));
     }, 2000);
   });
   return (
@@ -137,7 +99,7 @@ const HomeMain = ({ navigation, route }) => {
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Income</Text>
-                <Text style={styles.incomeExpAmount}>₹ {globalState.incomeBal}</Text>
+                <Text style={styles.incomeExpAmount}>₹ {incomeBal}</Text>
               </View>
             </View>
             <View style={[styles.incomeExpContainer, { backgroundColor: Colours.RED_THEME }]}>
@@ -146,7 +108,7 @@ const HomeMain = ({ navigation, route }) => {
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Expense</Text>
-                <Text style={styles.incomeExpAmount}>₹ {globalState.expenseBal}</Text>
+                <Text style={styles.incomeExpAmount}>₹ {expenseBal}</Text>
               </View>
             </View>
           </View>
@@ -252,12 +214,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   incomeExpLabel: {
-    fontWeight: 500,
+    fontWeight: '500',
     fontSize: 14,
     color: Colours.WHITISH,
   },
   incomeExpAmount: {
-    fontWeight: 600,
+    fontWeight: '600',
     fontSize: 22,
     color: Colours.WHITISH,
   },

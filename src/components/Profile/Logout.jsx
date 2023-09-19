@@ -4,14 +4,15 @@ import Modal from 'react-native-modal';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ScreenNames } from '../../constants/constant';
+import { useDispatch } from 'react-redux';
+import { userLogout } from '../../redux/slices/users';
 
 const Logout = ({ state, setLogout, navigation }) => {
+  const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
       await GoogleSignin.signOut();
-      await AsyncStorage.removeItem('isLoggedIn');
-      await AsyncStorage.removeItem('userInfo');
-      await AsyncStorage.removeItem('token');
+      dispatch(userLogout());
       navigation.replace(ScreenNames.ON_BOARDING_SCREEN);
     } catch (error) {
       console.error(error);

@@ -8,9 +8,14 @@ import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Colours, ScreenNames, tableNames } from '../constants/constant';
 import SQLite from '../sqlite/sql';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
 const AddExpense = ({ navigation }) => {
   const { userId } = useSelector(state => state.userDetails);
+  const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal } = useSelector(
+    state => state.transactions,
+  );
+  const dispatch = useDispatch();
   const [selectedBox, setSelectedBox] = useState('debit');
   const [selectedHeaderTxt, setSelectedHeaderTxt] = useState('Expense');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -26,6 +31,7 @@ const AddExpense = ({ navigation }) => {
     category: 'Select Category',
     date: moment(selectedDate, 'DD-MM-YYYY').toISOString(),
     isExpense: true,
+    isSynced: 0,
   });
   const checkEmptyInput = value => {
     if (value) return true;
@@ -45,7 +51,14 @@ const AddExpense = ({ navigation }) => {
       setButtonDisabled(true);
     }
   }, [transactionDetails]);
-
+  useEffect(() => {
+    if (transactionAdded) {
+      navigation.navigate(ScreenNames.HOME_TAB, { isData: true });
+    }
+    return () => {
+      dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
+    };
+  }, [dispatch, transactionAdded]);
   const handleInputs = (value, name) => {
     setTransactionDetails({
       ...transactionDetails,
@@ -72,16 +85,17 @@ const AddExpense = ({ navigation }) => {
   };
   const handleSubmit = async () => {
     const isoDate = moment(selectedDate, 'DD-MM-YYYY').toISOString();
-    const newData = { ...transactionDetails, date: isoDate };
-    console.log('newData => ', newData);
-    const response = await SQLite.insertData(newData);
+    const newData = {
+      ...transactionDetails,
+      date: isoDate,
+      bankAmount,
+      cashAmount,
+      incomeBal,
+      expenseBal,
+    };
+    // const response = await SQLite.insertData(newData);
+    dispatch(AddOneTrasaction(newData));
     // await SQLite.updateUserDetails(tableNames.USER_TABLE, {userId : transactionDetails.userId, bankAmount: 0, cashAmount :0 })
-    console.log('response => ', response);
-    if (response == 1) {
-      navigation.navigate(ScreenNames.HOME_TAB, { isData: true });
-    } else {
-      console.log('something went wrong');
-    }
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -265,7 +279,7 @@ const styles = StyleSheet.create({
   headerTxtContainer: { flex: 1, alignItems: 'center' },
   headerTxt: {
     fontSize: 18,
-    fontWeight: 600,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
   amountContainer: {

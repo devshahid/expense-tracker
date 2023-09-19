@@ -7,9 +7,11 @@ import { Images, ScreenNames } from '../constants/constant';
 import client from '../utils/axios';
 import Snackbar from 'react-native-snackbar';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUserTokenAndId } from '../redux/slices/users';
+import { updateUserTokenAndId, userLogin } from '../redux/slices/users';
+import DotsAnimation from '../components/Loaders/DotLoader';
 const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
+  const { token, userId, isLoading } = useSelector(state => state.userDetails);
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__
@@ -32,7 +34,11 @@ const Login = ({ navigation, route }) => {
       }, 3000);
     }
   }, [route.params]);
-
+  useEffect(() => {
+    if (token) {
+      navigation.replace(ScreenNames.MAIN_SCREEN);
+    }
+  }, [token]);
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
@@ -46,18 +52,7 @@ const Login = ({ navigation, route }) => {
   const handleSubmitData = async () => {
     if (userDetails.email && userDetails.password) {
       try {
-        const response = await client.post('/api/user/login', userDetails);
-        const { token, message, userId } = response.data;
-        if (token) {
-          // store the token in the global store
-          const data = { token, userId };
-          dispatch(updateUserTokenAndId(data));
-          await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-          await AsyncStorage.setItem('userData', JSON.stringify(data));
-          navigation.replace(ScreenNames.MAIN_SCREEN);
-        } else {
-          console.log('mymsg => ', message);
-        }
+        dispatch(userLogin(userDetails));
       } catch (error) {
         console.log(error);
       }
@@ -75,17 +70,7 @@ const Login = ({ navigation, route }) => {
         isGoogleLogin: true,
         googleLoginId: userInfo?.user?.id,
       };
-      const response = await client.post('/api/user/login', userDetails);
-      console.log('response => ', response.data);
-      const { token, userId } = response.data;
-      if (token) {
-        console.log('token => ', token, userId);
-        const data = { token, userId };
-        dispatch(updateUserTokenAndId(data));
-        await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-        await AsyncStorage.setItem('userData', JSON.stringify(data));
-        navigation.replace(ScreenNames.MAIN_SCREEN);
-      }
+      dispatch(userLogin(userDetails));
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
@@ -104,6 +89,14 @@ const Login = ({ navigation, route }) => {
   const handleNavigation = () => {
     navigation.navigate(ScreenNames.SIGNUP_SCREEN);
   };
+
+  if (isLoading) {
+    return (
+      <>
+        <DotsAnimation />
+      </>
+    );
+  }
   return (
     <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="handled">
       <View style={styles.mainContainer}>

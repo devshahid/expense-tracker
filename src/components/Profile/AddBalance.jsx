@@ -2,20 +2,29 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-nativ
 import React, { useState } from 'react';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Colours, tableNames } from '../../constants/constant';
+import { Colours } from '../../constants/constant';
 import { Picker } from '@react-native-picker/picker';
-import SQLite from '../../sqlite/sql';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateAmountDetails } from '../../redux/slices/users';
+import { useEffect } from 'react';
+import { resetTransactionAdded, updateUserAmount } from '../../redux/slices/transactions';
 
 const AddBalance = ({ state, setAddBalance }) => {
   const dispatch = useDispatch();
-  const globalState = useSelector(state => state.userDetails);
+  const { userId, bankAmount, cashAmount } = useSelector(state => state.userDetails);
+  const { transactionAdded } = useSelector(state => state.transactions);
   const [amountDetails, setAmountDetails] = useState({
     select: 'Bank',
     amount: 0,
   });
-
+  useEffect(() => {
+    // close popup and show the notification
+    if (transactionAdded) {
+      setAddBalance(false);
+    }
+    return () => {
+      dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
+    };
+  }, [dispatch, transactionAdded]);
   const handleInputs = (value, name) => {
     setAmountDetails({
       ...amountDetails,
@@ -24,22 +33,17 @@ const AddBalance = ({ state, setAddBalance }) => {
   };
   const handleSubmitBtn = async () => {
     const newObj = {
-      userId: globalState.userId,
+      userId,
     };
-
+    // add a track record into db of the amount added from profile
+    // create a dispatch action to update the amount bank or cash in db and state as well based on -\+
     if (amountDetails.select === 'Bank') {
-      newObj['bankAmount'] = amountDetails.amount + globalState.bankAmount;
+      newObj['bankAmount'] = amountDetails.amount + bankAmount;
     } else {
-      newObj['cashAmount'] = amountDetails.amount + globalState.cashAmount;
+      newObj['cashAmount'] = amountDetails.amount + cashAmount;
     }
-    const updatedRows = await SQLite.updateUserDetails(tableNames.USER_TABLE, newObj);
-    if (updatedRows.status) {
-      delete newObj.userId;
-      // update the redux state also
-      dispatch(updateAmountDetails(newObj));
-      // close popup and show the notification
-      setAddBalance(false);
-    }
+    console.log('newObj => ', newObj);
+    dispatch(updateUserAmount(newObj));
   };
   return (
     <View>

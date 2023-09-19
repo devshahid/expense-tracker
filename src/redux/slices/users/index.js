@@ -1,44 +1,80 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import client from '../../../utils/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const initialState = {
   token: null,
   userId: null,
-  bankAmount: 0,
-  cashAmount: 0,
-  incomeBal: 50,
-  expenseBal: 90,
+  isLoading: false,
+  error: null,
+  message: null,
 };
+
+export const userLogin = createAsyncThunk('userLogin', async (userDetails, { rejectWithValue }) => {
+  try {
+    const response = await client.post('/api/user/login', userDetails);
+    const { token, message, userId } = response.data;
+    await AsyncStorage.setItem('userData', JSON.stringify({ token, userId }));
+    return {
+      token,
+      message,
+      userId,
+    };
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
+
+export const userLogout = createAsyncThunk('userLogout', async (args, { rejectWithValue }) => {
+  try {
+    await AsyncStorage.removeItem('userData');
+    return true;
+  } catch (err) {
+    return rejectWithValue(err);
+  }
+});
 
 export const userDetailSlice = createSlice({
   name: 'userDetails',
   initialState,
   reducers: {
     updateUserTokenAndId: (state, action) => {
-      const { token, userId } = action.payload;
-      return {
-        ...state,
-        token: token,
-        userId: userId,
-      };
+      if (action.payload) {
+        const { token, userId } = action.payload;
+        state.token = token;
+        state.userId = userId;
+      }
     },
-    updateAmountDetails: (state, action) => {
-      return {
-        ...state,
-        ...action.payload,
-      };
+  },
+  extraReducers: {
+    [userLogin.pending]: state => {
+      state.isLoading = true;
     },
-    updateIncomeAndExpense: (state, action) => {
-      const { expense, income } = action.payload;
-      console.log('action.payload => ', action.payload);
-      return {
-        ...state,
-        incomeBal: income,
-        expenseBal: expense,
-      };
+    [userLogin.fulfilled]: (state, action) => {
+      state.isLoading = false;
+      state.token = action.payload.token;
+      state.userId = action.payload.userId;
+      state.message = action.payload.message;
+    },
+    [userLogin.rejected]: (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    [userLogout.pending]: state => {
+      state.isLoading = true;
+    },
+    [userLogout.fulfilled]: state => {
+      state.isLoading = false;
+      state.token = null;
+      state.userId = null;
+      state.message = null;
+    },
+    [userLogout.rejected]: (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
     },
   },
 });
 
-export const { updateUserTokenAndId, updateAmountDetails, updateIncomeAndExpense } =
-  userDetailSlice.actions;
+export const { updateUserTokenAndId } = userDetailSlice.actions;
 
 export default userDetailSlice.reducer;
