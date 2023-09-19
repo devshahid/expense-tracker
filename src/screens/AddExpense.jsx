@@ -1,45 +1,46 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  Modal,
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import IconIonics from 'react-native-vector-icons/Ionicons';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import moment from 'moment';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { categoryOptions, paymentOptions } from '../constants/data';
 import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { Colours, ScreenNames } from '../constants/constant';
-
+import { Colours, ScreenNames, tableNames } from '../constants/constant';
+import SQLite from '../sqlite/sql';
+import { useSelector, useDispatch } from 'react-redux';
+import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
 const AddExpense = ({ navigation }) => {
+  const { userId } = useSelector(state => state.userDetails);
+  const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal } = useSelector(
+    state => state.transactions,
+  );
+  const dispatch = useDispatch();
   const [selectedBox, setSelectedBox] = useState('debit');
   const [selectedHeaderTxt, setSelectedHeaderTxt] = useState('Expense');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const date = new Date();
+  const date = Date.now();
   const formattedDate = moment(date);
   const [selectedDate, setSelectedDate] = useState(moment(formattedDate).format('DD-MM-YYYY'));
-  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
   const [transactionDetails, setTransactionDetails] = useState({
+    userId: userId,
     name: null,
-    amount: null,
+    amount: 0,
     paymentMode: 'Payment Mode',
     category: 'Select Category',
-    date: formattedDate,
+    date: moment(selectedDate, 'DD-MM-YYYY').toISOString(),
     isExpense: true,
+    isSynced: 0,
   });
   const checkEmptyInput = value => {
     if (value) return true;
     else return false;
   };
   useEffect(() => {
-    const { name, amount, paymentMode, category } = transactionDetails;
+    const { userId, name, amount, paymentMode, category } = transactionDetails;
     if (
+      checkEmptyInput(userId) &&
       checkEmptyInput(name) &&
       checkEmptyInput(amount) &&
       checkEmptyInput(paymentMode) &&
@@ -50,7 +51,14 @@ const AddExpense = ({ navigation }) => {
       setButtonDisabled(true);
     }
   }, [transactionDetails]);
-
+  useEffect(() => {
+    if (transactionAdded) {
+      navigation.navigate(ScreenNames.HOME_TAB, { isData: true });
+    }
+    return () => {
+      dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
+    };
+  }, [dispatch, transactionAdded]);
   const handleInputs = (value, name) => {
     setTransactionDetails({
       ...transactionDetails,
@@ -76,18 +84,18 @@ const AddExpense = ({ navigation }) => {
     setDatePickerVisibility(!isDatePickerVisible);
   };
   const handleSubmit = async () => {
-    const transactionData = await AsyncStorage.getItem('transactionData');
-    if (!transactionData) {
-      const dataArr = [];
-      dataArr.push(transactionDetails);
-      await AsyncStorage.setItem('transactionData', JSON.stringify(dataArr));
-    } else {
-      const dataArr = JSON.parse(transactionData);
-      dataArr.push(transactionDetails);
-      await AsyncStorage.setItem('transactionData', JSON.stringify(dataArr));
-      console.log('dataArr => ', dataArr);
-    }
-    navigation.navigate(ScreenNames.HOME_MAIN_SCREEN, { isData: true });
+    const isoDate = moment(selectedDate, 'DD-MM-YYYY').toISOString();
+    const newData = {
+      ...transactionDetails,
+      date: isoDate,
+      bankAmount,
+      cashAmount,
+      incomeBal,
+      expenseBal,
+    };
+    // const response = await SQLite.insertData(newData);
+    dispatch(AddOneTrasaction(newData));
+    // await SQLite.updateUserDetails(tableNames.USER_TABLE, {userId : transactionDetails.userId, bankAmount: 0, cashAmount :0 })
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -127,7 +135,7 @@ const AddExpense = ({ navigation }) => {
             placeholderTextColor={'#FCFCFC'}
             style={[styles.amountValue, { fontSize: 60, width: '100%' }]}
             keyboardType="numeric"
-            onChangeText={value => handleInputs(value, 'amount')}
+            onChangeText={value => handleInputs(Number(value), 'amount')}
           />
         </View>
       </View>
@@ -140,6 +148,7 @@ const AddExpense = ({ navigation }) => {
                 onChangeText={value => handleInputs(value, 'name')}
                 placeholder="Name"
                 placeholderTextColor={'grey'}
+                value={transactionDetails.name}
               />
             </View>
           </View>
@@ -270,7 +279,7 @@ const styles = StyleSheet.create({
   headerTxtContainer: { flex: 1, alignItems: 'center' },
   headerTxt: {
     fontSize: 18,
-    fontWeight: 600,
+    fontWeight: '600',
     color: '#FFFFFF',
   },
   amountContainer: {

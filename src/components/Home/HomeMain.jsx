@@ -12,9 +12,15 @@ import TransactionView from '../../views/TransactionView';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { LineChart } from 'react-native-chart-kit';
 import Tabs from './Tabs';
-import { Colours } from '../../constants/constant';
-
+import { Colours, ScreenNames } from '../../constants/constant';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserTransactions } from '../../redux/slices/transactions';
 const HomeMain = ({ navigation, route }) => {
+  const dispatch = useDispatch();
+  const { userId, token } = useSelector(state => state.userDetails);
+  const { transactionList, bankAmount, cashAmount, incomeBal, expenseBal } = useSelector(
+    state => state.transactions,
+  );
   const [selectedTab, setSelectedTab] = useState('Today');
   const [graphLabels, setGraphLabels] = useState([
     '6AM-10AM',
@@ -26,6 +32,15 @@ const HomeMain = ({ navigation, route }) => {
   const [graphData, setGraphData] = useState([10, 15, 20, 12, 50]);
   const [refreshing, setRefreshing] = useState(false);
   const [toggleTransaction, setToggleTransaction] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
+  useEffect(() => {
+    // dispatch action to read data from db for transaction list and income expense
+    dispatch(getUserTransactions(userId));
+  }, []);
+
+  useEffect(() => {
+    setTotalAmount(Number(cashAmount) + Number(bankAmount));
+  }, [bankAmount, cashAmount]);
   useEffect(() => {
     if (selectedTab === 'Today') {
       setGraphLabels(['6AM-10AM', '10AM-2PM', '2PM-6PM', '6PM-10PM', '10PM-2AM']);
@@ -67,14 +82,15 @@ const HomeMain = ({ navigation, route }) => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      setToggleTransaction(!toggleTransaction);
     }, 2000);
-  }, []);
+  });
   return (
     <>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View style={{ flex: 1, marginHorizontal: 5, backgroundColor: Colours.WHITE_PURE }}>
           <View style={styles.balanceContainer}>
-            <Text style={styles.balanceStyle}>₹ 0</Text>
+            <Text style={styles.balanceStyle}>₹ {totalAmount}</Text>
           </View>
           <View style={styles.incomeExpMainContainer}>
             <View style={[styles.incomeExpContainer, { backgroundColor: Colours.GREEN_THEME }]}>
@@ -83,7 +99,7 @@ const HomeMain = ({ navigation, route }) => {
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Income</Text>
-                <Text style={styles.incomeExpAmount}>₹ 0</Text>
+                <Text style={styles.incomeExpAmount}>₹ {incomeBal}</Text>
               </View>
             </View>
             <View style={[styles.incomeExpContainer, { backgroundColor: Colours.RED_THEME }]}>
@@ -92,7 +108,7 @@ const HomeMain = ({ navigation, route }) => {
               </View>
               <View>
                 <Text style={styles.incomeExpLabel}>Expense</Text>
-                <Text style={styles.incomeExpAmount}>₹ 0</Text>
+                <Text style={styles.incomeExpAmount}>₹ {expenseBal}</Text>
               </View>
             </View>
           </View>
@@ -160,17 +176,16 @@ const HomeMain = ({ navigation, route }) => {
             route={route}
             navigation={navigation}
             toggleTransaction={toggleTransaction}
+            dataArr={transactionList}
+            onRefreshComplete={onRefresh}
           />
         </View>
       </ScrollView>
       <View id="add_expense_container" style={styles.addExpContainer}>
-        <TouchableOpacity style={styles.iconBtn}>
-          <Icon
-            name="plus"
-            size={24}
-            style={styles.addIcon}
-            onPress={() => navigation.navigate('Add_Expense')}
-          />
+        <TouchableOpacity
+          style={styles.iconBtn}
+          onPress={() => navigation.navigate(ScreenNames.ADD_EXPENSE_SCREEN)}>
+          <Icon name="plus" size={24} style={styles.addIcon} />
         </TouchableOpacity>
       </View>
     </>
@@ -199,12 +214,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   incomeExpLabel: {
-    fontWeight: 500,
+    fontWeight: '500',
     fontSize: 14,
     color: Colours.WHITISH,
   },
   incomeExpAmount: {
-    fontWeight: 600,
+    fontWeight: '600',
     fontSize: 22,
     color: Colours.WHITISH,
   },

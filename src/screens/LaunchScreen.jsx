@@ -3,12 +3,19 @@ import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Images, ScreenNames } from '../constants/constant';
 import { Image } from 'react-native';
-
+import { useDispatch } from 'react-redux';
+import { updateUserTokenAndId } from '../redux/slices/users';
 const LaunchScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   useEffect(() => {
     async function getItems() {
-      const status = await AsyncStorage.getItem('isLoggedIn');
-      if (JSON.parse(status) === true) {
+      const userData = await AsyncStorage.getItem('userData');
+      const data = JSON.parse(userData);
+      console.log('data => ', data);
+      if (data) {
+        // write logic to fetch data from database and update the state
+        // const data = JSON.parse(await AsyncStorage.getItem('userData'));
+        dispatch(updateUserTokenAndId(data));
         navigation.replace(ScreenNames.MAIN_SCREEN);
       } else {
         navigation.replace(ScreenNames.ON_BOARDING_SCREEN);

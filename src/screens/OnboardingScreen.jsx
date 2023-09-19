@@ -9,10 +9,9 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import React, { useState, useRef } from 'react';
-
+import React, { useState, useRef, useEffect } from 'react';
 import { Colours, ScreenNames, onboardingSlides } from '../constants/constant';
-
+import SQLite from '../sqlite/sql';
 const { width, height } = Dimensions.get('window');
 const Slide = ({ item }) => {
   return (
@@ -26,7 +25,9 @@ const Slide = ({ item }) => {
 const OnboardingScreen = ({ navigation }) => {
   const [sliderIndex, setSliderIndex] = useState(0);
   const ref = useRef(null);
-
+  useEffect(() => {
+    SQLite.checkAndCreateTransTable();
+  }, []);
   const handleNavigation = () => {
     const nextSliderIndex = sliderIndex + 1;
     if (nextSliderIndex != onboardingSlides.length) {

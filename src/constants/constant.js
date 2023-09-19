@@ -7,6 +7,7 @@ export const ScreenNames = {
   HOME_TAB: 'Home',
   PROFILE_TAB: 'Profile',
   LAUNCH_SCREEN: 'LaunchScreen',
+  SIGNUP_SCREEN: 'SignupScreen',
 };
 
 export const Colours = {
@@ -30,6 +31,7 @@ export const Images = {
   ONBOARDING_IMAGE_1: require('../assets/money-stress.png'),
   ONBOARDING_IMAGE_2: require('../assets/money-savings.png'),
   ONBOARDING_IMAGE_3: require('../assets/money-analyze.png'),
+  SIGNUP_IMAGE: require('../assets/Signup.png'),
 };
 export const onboardingSlides = [
   {
@@ -52,3 +54,8 @@ export const onboardingSlides = [
       "Collaborate with our app's powerful tools and make informed decisions with your financial data",
   },
 ];
+
+export const tableNames = {
+  USER_TABLE: 'userdetails',
+  TRANSACTION_TABLE: 'transactions',
+};

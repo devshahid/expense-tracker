@@ -1,21 +1,9 @@
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import TransactionList from '../components/Home/TransactionList';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Entypo';
-const TransactionView = ({ route, navigation, toggleTransaction }) => {
-  const [dataArr, setDataArr] = useState([]);
+const TransactionView = ({ dataArr }) => {
   const [showModal, setShowModal] = useState(false);
-  console.log('dataArr => ', dataArr);
-  useEffect(() => {
-    async function getTransactionItems() {
-      const dataArr = await AsyncStorage.getItem('transactionData');
-      if (dataArr) {
-        setDataArr(JSON.parse(dataArr));
-      }
-    }
-    getTransactionItems();
-  }, [route.params?.isData, showModal, toggleTransaction]);
   return (
     <View>
       <View style={[styles.recentContainer, { marginHorizontal: 5 }]}>
@@ -30,6 +18,7 @@ const TransactionView = ({ route, navigation, toggleTransaction }) => {
         {dataArr.length > 0 ? (
           dataArr
             .slice(0, 10)
+            .reverse()
             .map((element, i) => (
               <TransactionList
                 key={i}
@@ -67,16 +56,18 @@ const TransactionView = ({ route, navigation, toggleTransaction }) => {
         </View>
         <ScrollView>
           {dataArr.length > 0 &&
-            dataArr.map((element, i) => (
-              <TransactionList
-                key={i}
-                name={element.name}
-                category={element.category}
-                amount={element.amount}
-                date={element.date}
-                isExpense={element.isExpense}
-              />
-            ))}
+            [...dataArr]
+              .reverse()
+              .map((element, i) => (
+                <TransactionList
+                  key={i}
+                  name={element.name}
+                  category={element.category}
+                  amount={element.amount}
+                  date={element.date}
+                  isExpense={element.isExpense}
+                />
+              ))}
         </ScrollView>
       </Modal>
     </View>
