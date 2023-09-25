@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import client from '../../../utils/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { tableNames } from '../../../constants/constant';
+import SQLite from '../../../sqlite/sql';
 const initialState = {
   token: null,
   userId: null,
@@ -25,7 +26,22 @@ export const userLogin = createAsyncThunk('userLogin', async (userDetails, { rej
     return rejectWithValue(error);
   }
 });
-
+export const userRegister = createAsyncThunk(
+  'userRegister',
+  async (userDetails, { rejectWithValue }) => {
+    try {
+      const response = await client.post('/api/user/sign-up', userDetails);
+      const { userData, status, message } = response.data;
+      console.log(response.data);
+      if (response.status === 201 && status && userData._id) {
+        return message;
+      }
+      return false;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  },
+);
 export const userLogout = createAsyncThunk('userLogout', async (args, { rejectWithValue }) => {
   try {
     await AsyncStorage.removeItem('userData');
@@ -45,6 +61,11 @@ export const userDetailSlice = createSlice({
         state.token = token;
         state.userId = userId;
       }
+    },
+    resetUserDetails: (state, action) => {
+      state.isLoading = false;
+      state.error = null;
+      state.message = null;
     },
   },
   extraReducers: builder => {
@@ -74,9 +95,20 @@ export const userDetailSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     });
+    builder.addCase(userRegister.pending, state => {
+      state.isLoading = true;
+    });
+    builder.addCase(userRegister.fulfilled, (state, action) => {
+      if (action.payload) {
+        state.message = action.payload.message;
+      } else {
+        state.error = action.payload;
+      }
+    });
+    builder.addCase(userRegister.rejected, state => {});
   },
 });
 
-export const { updateUserTokenAndId } = userDetailSlice.actions;
+export const { updateUserTokenAndId, resetUserDetails } = userDetailSlice.actions;
 
 export default userDetailSlice.reducer;

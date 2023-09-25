@@ -52,12 +52,19 @@ export const getUserTransactions = createAsyncThunk(
             }
           }
         });
-      return {
-        transactionList,
+      const obj = {
         income,
         expense,
         bankAmount: bankAmount ?? 0,
         cashAmount: cashAmount ?? 0,
+      };
+      if (Array.isArray(transactionList) && !transactionList.message) {
+        obj.transactionList = transactionList;
+      } else {
+        obj.message = transactionList.message;
+      }
+      return {
+        ...obj,
       };
     } catch (error) {
       return rejectWithValue(error);
@@ -140,11 +147,13 @@ export const transactionDetailsSlice = createSlice({
     builder.addCase(getUserTransactions.fulfilled, (state, action) => {
       state.isLoading = false;
       if (!action.payload.message) {
-        state.transactionList = [...action.payload.transactionList];
-        state.incomeBal = action.payload.income;
-        state.expenseBal = action.payload.expense;
-        state.bankAmount = action.payload.bankAmount;
-        state.cashAmount = action.payload.cashAmount;
+        state.transactionList = [...action.payload?.transactionList];
+        state.incomeBal = action.payload?.income;
+        state.expenseBal = action.payload?.expense;
+        state.bankAmount = action.payload?.bankAmount;
+        state.cashAmount = action.payload?.cashAmount;
+      } else {
+        state.message = action.payload.message;
       }
     });
     builder.addCase(getUserTransactions.rejected, (state, action) => {

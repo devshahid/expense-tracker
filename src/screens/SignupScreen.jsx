@@ -1,13 +1,14 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Images, ScreenNames } from '../constants/constant';
-import client from '../utils/axios';
 import ENV_VAR from '../config/config';
+import { resetUserDetails, userRegister } from '../redux/slices/users';
+import { useSelector, useDispatch } from 'react-redux';
 const SignupScreen = ({ navigation }) => {
-  const { BACKEND_URL } = ENV_VAR;
+  const dispatch = useDispatch();
+  const { message } = useSelector(state => state.userDetails);
   const [userDetails, setUserDetails] = useState({
     name: '',
     email: '',
@@ -15,6 +16,16 @@ const SignupScreen = ({ navigation }) => {
     password: '',
     cpassword: '',
   });
+
+  useEffect(() => {
+    if (message === 'User created successfully') {
+      navigation.replace(ScreenNames.LOGIN_SCREEN, { success: true });
+    }
+    return () => {
+      dispatch(resetUserDetails()); // Define and dispatch this action to reset the flag
+    };
+  }, [message]);
+
   const handleFormData = (value, name) => {
     setUserDetails({
       ...userDetails,
@@ -23,16 +34,9 @@ const SignupScreen = ({ navigation }) => {
   };
   const handleSubmitData = async () => {
     try {
-      const response = await client.post('/api/user/sign-up', userDetails);
-      const { userData, status } = response.data;
-      if (response.status === 201 && status === true && userData._id) {
-        // await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
-        navigation.replace(ScreenNames.LOGIN_SCREEN, { success: true });
-      } else {
-        console.log('error matching');
-      }
+      dispatch(userRegister(userDetails));
+      navigation.replace(ScreenNames.LOGIN_SCREEN, { success: true });
     } catch (error) {
-      // snackbar
       console.log(error);
     }
   };
