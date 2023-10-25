@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { resetTransactionAdded, updateUserAmount } from '../../redux/slices/transactions';
 import ProfileModal from '../Modal/ProfileModal';
+import { showMessage } from 'react-native-flash-message';
 
 const AddBalance = ({ state, setAddBalance }) => {
   const dispatch = useDispatch();
@@ -19,6 +20,12 @@ const AddBalance = ({ state, setAddBalance }) => {
     // close popup and show the notification
     if (transactionAdded) {
       setAddBalance(false);
+      showMessage({
+        message: 'Balance Added',
+        type: 'success',
+        duration: 2500,
+        icon: 'success',
+      });
     }
     return () => {
       setAmountDetails({

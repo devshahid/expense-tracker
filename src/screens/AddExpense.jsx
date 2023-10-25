@@ -10,6 +10,7 @@ import { Colours, ScreenNames, tableNames } from '../constants/constant';
 import Snackbar from 'react-native-snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
+import { showMessage } from 'react-native-flash-message';
 const AddExpense = ({ navigation }) => {
   const { userId } = useSelector(state => state.userDetails);
   const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message } = useSelector(
@@ -65,6 +66,12 @@ const AddExpense = ({ navigation }) => {
       }, 5000);
     } else if (transactionAdded) {
       navigation.navigate(ScreenNames.HOME_TAB, { isData: true });
+      showMessage({
+        message: 'Transaction Added',
+        type: 'success',
+        duration: 2500,
+        icon: 'success',
+      });
     }
     return () => {
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag

@@ -1,7 +1,8 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-
+import { useSelector } from 'react-redux';
 const ProfileMainCard = () => {
+  const { userName } = useSelector(state => state.userDetails);
   return (
     <View style={styles.profileMainCardContainer}>
       <View style={styles.profileImageConatiner}>
@@ -11,7 +12,7 @@ const ProfileMainCard = () => {
         />
       </View>
       <View>
-        <Text style={styles.profileNameTxt}>Shahid Qureshi</Text>
+        <Text style={styles.profileNameTxt}>{userName}</Text>
       </View>
     </View>
   );

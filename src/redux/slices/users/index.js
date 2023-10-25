@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { tableNames } from '../../../constants/constant';
 import SQLite from '../../../sqlite/sql';
 const initialState = {
+  userName: null,
   token: null,
   userId: null,
   isLoading: false,
@@ -15,12 +16,16 @@ export const userLogin = createAsyncThunk('userLogin', async (userDetails, { rej
   try {
     const response = await client.post('/api/user/login', userDetails);
     const { token, message, userId } = response.data;
-    SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, userId);
-    await AsyncStorage.setItem('userData', JSON.stringify({ token, userId }));
+    SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, { userId, userName: userDetails.name });
+    await AsyncStorage.setItem(
+      'userData',
+      JSON.stringify({ token, userId, userName: userDetails.name }),
+    );
     return {
       token,
       message,
       userId,
+      userName: userDetails.name,
     };
   } catch (error) {
     return rejectWithValue(error);
@@ -57,9 +62,10 @@ export const userDetailSlice = createSlice({
   reducers: {
     updateUserTokenAndId: (state, action) => {
       if (action.payload) {
-        const { token, userId } = action.payload;
+        const { token, userId, userName } = action.payload;
         state.token = token;
         state.userId = userId;
+        state.userName = userName;
       }
     },
     resetUserDetails: (state, action) => {
@@ -77,6 +83,7 @@ export const userDetailSlice = createSlice({
       state.token = action.payload.token;
       state.userId = action.payload.userId;
       state.message = action.payload.message;
+      state.userName = action.payload.userName;
     });
     builder.addCase(userLogin.rejected, (state, action) => {
       state.isLoading = false;
