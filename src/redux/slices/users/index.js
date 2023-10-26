@@ -15,17 +15,14 @@ const initialState = {
 export const userLogin = createAsyncThunk('userLogin', async (userDetails, { rejectWithValue }) => {
   try {
     const response = await client.post('/api/user/login', userDetails);
-    const { token, message, userId } = response.data;
-    SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, { userId, userName: userDetails.name });
-    await AsyncStorage.setItem(
-      'userData',
-      JSON.stringify({ token, userId, userName: userDetails.name }),
-    );
+    const { token, message, userId, userName } = response.data;
+    SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, { userId, userName });
+    await AsyncStorage.setItem('userData', JSON.stringify({ token, userId, userName }));
     return {
       token,
       message,
       userId,
-      userName: userDetails.name,
+      userName,
     };
   } catch (error) {
     return rejectWithValue(error);
@@ -40,8 +37,9 @@ export const userRegister = createAsyncThunk(
       console.log(response.data);
       if (response.status === 201 && status && userData._id) {
         return message;
+      } else {
+        return message;
       }
-      return false;
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -112,7 +110,10 @@ export const userDetailSlice = createSlice({
         state.error = action.payload;
       }
     });
-    builder.addCase(userRegister.rejected, state => {});
+    builder.addCase(userRegister.rejected, state => {
+      state.isLoading = false;
+      state.error = action.payload;
+    });
   },
 });
 
