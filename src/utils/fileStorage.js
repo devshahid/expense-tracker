@@ -4,37 +4,33 @@ import { check, request, PERMISSIONS, RESULTS, openSettings } from 'react-native
 import DocumentPicker from 'react-native-document-picker';
 import SQLite from '../sqlite/sql';
 import { showMessage } from 'react-native-flash-message';
+import { FileSystem } from 'react-native-file-access';
 export const storeDataInStorage = async query => {
   return new Promise(async (resolve, reject) => {
     try {
-      let externalStoragePermission, writePermission, readPermission;
-      // for android platform 11 or above
-      if (Platform.Version >= 30) {
-        externalStoragePermission = await checkPermission(
-          PERMISSIONS.ANDROID.MANAGE_EXTERNAL_STORAGE,
-        );
-      } else {
-        writePermission = await checkPermission(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE);
-        readPermission = await checkPermission(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
-      }
-      if ((writePermission && readPermission) || externalStoragePermission) {
-        const dirPath = `${RNFS.ExternalStorageDirectoryPath}/Expense Tracker`;
-        const isExist = await isDirExist(dirPath);
-        if (!isExist) {
-          await createDir(dirPath);
-          var storagePath = await writeData(query, `${dirPath}/storageFile.sql`);
+      if (Platform.OS === 'android') {
+        const writePermission = await checkPermission(PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE);
+        const readPermission = await checkPermission(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
+        if (writePermission && readPermission) {
+          const tempDir = `${RNFS.TemporaryDirectoryPath}/storageFile.sql`;
+
+          // creating file with the sql query at temp location
+          const storagePath = await writeData(query, `${tempDir}`);
+          if (storagePath) {
+            // copying file from temp location to download directory
+            await FileSystem.cpExternal(storagePath, `storageFile.sql`, 'downloads');
+            await FileSystem.unlink(storagePath);
+            const [path] = storagePath.split('com');
+            const filePath = `${path}downloads/storageFile.sql`;
+            resolve(filePath);
+          } else {
+            reject('Something went wrong while writing the file');
+          }
         } else {
-          var storagePath = await writeData(query, `${dirPath}/storageFile.sql`);
+          // show error permission not granted and a button to open the popup
+          // open setting logic
+          await openSettings();
         }
-        if (storagePath) {
-          resolve(storagePath);
-        } else {
-          reject('Something went wrong while writing the file');
-        }
-      } else {
-        // show error permission not granted and a button to open the popup
-        // open setting logic
-        await openSettings();
       }
     } catch (error) {
       showMessage({
@@ -44,6 +40,7 @@ export const storeDataInStorage = async query => {
         duration: 2500,
         icon: 'danger',
       });
+      console.log('error => ', error);
       reject(error);
     }
   });

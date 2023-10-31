@@ -67,6 +67,7 @@ const Login = ({ navigation, route }) => {
         email: userInfo?.user?.email,
         isGoogleLogin: true,
         googleLoginId: userInfo?.user?.id,
+        profilePhoto: userInfo?.user?.photo ?? '',
       };
       dispatch(userLogin(userDetails));
     } catch (error) {

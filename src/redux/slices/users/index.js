@@ -10,19 +10,28 @@ const initialState = {
   isLoading: false,
   error: null,
   message: null,
+  profilePhoto: null,
 };
 
 export const userLogin = createAsyncThunk('userLogin', async (userDetails, { rejectWithValue }) => {
   try {
     const response = await client.post('/api/user/login', userDetails);
-    const { token, message, userId, userName } = response.data;
-    SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, { userId, userName });
-    await AsyncStorage.setItem('userData', JSON.stringify({ token, userId, userName }));
+    const { token, message, userId, userName, profilePhoto } = response.data;
+    SQLite.checkAndCreateUserTable(tableNames.USER_TABLE, {
+      userId,
+      userName,
+      profilePhoto,
+    });
+    await AsyncStorage.setItem(
+      'userData',
+      JSON.stringify({ token, userId, userName, profilePhoto }),
+    );
     return {
       token,
       message,
       userId,
       userName,
+      profilePhoto,
     };
   } catch (error) {
     return rejectWithValue(error);
@@ -60,10 +69,11 @@ export const userDetailSlice = createSlice({
   reducers: {
     updateUserTokenAndId: (state, action) => {
       if (action.payload) {
-        const { token, userId, userName } = action.payload;
+        const { token, userId, userName, profilePhoto } = action.payload;
         state.token = token;
         state.userId = userId;
         state.userName = userName;
+        state.profilePhoto = profilePhoto;
       }
     },
     resetUserDetails: (state, action) => {
@@ -82,6 +92,7 @@ export const userDetailSlice = createSlice({
       state.userId = action.payload.userId;
       state.message = action.payload.message;
       state.userName = action.payload.userName;
+      state.profilePhoto = action.payload.profilePhoto;
     });
     builder.addCase(userLogin.rejected, (state, action) => {
       state.isLoading = false;
