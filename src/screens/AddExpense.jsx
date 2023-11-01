@@ -255,7 +255,7 @@ const AddExpense = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-        {modalType === 'Category' ? (
+        {modalType === 'Category' && (
           <DropdownContainer
             type="Category"
             options={categoryOptions}
@@ -264,7 +264,9 @@ const AddExpense = ({ navigation }) => {
             transactionDetails={transactionDetails}
             setTransactionDetails={setTransactionDetails}
           />
-        ) : (
+        )}
+
+        {modalType === 'Payment' && (
           <DropdownContainer
             type="Payment"
             options={paymentOptions}
