@@ -47,7 +47,7 @@ export const getUserTransactions = createAsyncThunk(
       let expense = 0;
       transactionList.length > 0 &&
         transactionList.map(item => {
-          const month = moment(item.date).format('MM');
+          const month = item.date.split('-')[1];
           if (month === currMonth) {
             if (item.isExpense === 0) {
               income += Number(item.amount);
@@ -70,9 +70,7 @@ export const getUserTransactions = createAsyncThunk(
       } else {
         obj.message = transactionList.message;
       }
-      return {
-        ...obj,
-      };
+      return obj;
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -158,17 +156,22 @@ export const transactionDetailsSlice = createSlice({
     });
     builder.addCase(getUserTransactions.fulfilled, (state, action) => {
       state.isLoading = false;
-      if (!action.payload.message) {
-        state.transactionList = [...action.payload?.transactionList];
-        state.incomeBal = action.payload?.income;
-        state.expenseBal = action.payload?.expense;
-        state.bankAmount = action.payload?.bankAmount;
-        state.cashAmount = action.payload?.cashAmount;
+      state.incomeBal = action.payload?.income;
+      state.expenseBal = action.payload?.expense;
+      state.bankAmount = action.payload?.bankAmount;
+      state.cashAmount = action.payload?.cashAmount;
+      state.message = action.payload?.message;
+      if (
+        action.payload.dailyAmountArr &&
+        action.payload.weeklyAmountArr &&
+        action.payload.monthlyAmountArr
+      ) {
         state.dailyAmountArr = action.payload?.dailyAmountArr;
         state.weeklyAmountArr = action.payload?.weeklyAmountArr;
         state.monthlyAmountArr = action.payload?.monthlyAmountArr;
-      } else {
-        state.message = action.payload.message;
+      }
+      if (action.payload.transactionList) {
+        state.transactionList = [...action.payload?.transactionList];
       }
     });
     builder.addCase(getUserTransactions.rejected, (state, action) => {

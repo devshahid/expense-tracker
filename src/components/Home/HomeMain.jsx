@@ -6,6 +6,7 @@ import { Colours, ScreenNames } from '../../constants/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserTransactions, updateAmountArr } from '../../redux/slices/transactions';
 import GraphicalView from '../../views/GraphicalView';
+import ActivityLoader from '../Loaders/ActivityLoader';
 const HomeMain = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { userId } = useSelector(state => state.userDetails);
@@ -19,6 +20,7 @@ const HomeMain = ({ navigation, route }) => {
     dailyAmountArr,
     weeklyAmountArr,
     monthlyAmountArr,
+    isLoading,
   } = useSelector(state => state.transactions);
   const [selectedTab, setSelectedTab] = useState('Today');
   const [graphLabels, setGraphLabels] = useState([
@@ -84,6 +86,10 @@ const HomeMain = ({ navigation, route }) => {
       setToggleTransaction(!toggleTransaction);
     }, 2000);
   });
+
+  if (isLoading) {
+    return <ActivityLoader />;
+  }
   return (
     <>
       <View style={{ flex: 1, backgroundColor: Colours.WHITE_PURE }}>

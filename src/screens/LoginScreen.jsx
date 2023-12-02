@@ -6,7 +6,6 @@ import { Images, ScreenNames } from '../constants/constant';
 import Snackbar from 'react-native-snackbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogin } from '../redux/slices/users';
-import DotsAnimation from '../components/Loaders/DotLoader';
 const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { token, isLoading } = useSelector(state => state.userDetails);
@@ -89,13 +88,6 @@ const Login = ({ navigation, route }) => {
     navigation.navigate(ScreenNames.SIGNUP_SCREEN);
   };
 
-  if (isLoading) {
-    return (
-      <>
-        <DotsAnimation />
-      </>
-    );
-  }
   return (
     <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="handled">
       <View style={styles.mainContainer}>
