@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '80%',
-    height: 40,
+    height: 50,
     borderColor: 'gray',
     borderWidth: 1,
     marginTop: 10,

@@ -3,7 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainScreen from './src/screens/MainScreen';
 import Login from './src/screens/LoginScreen';
-import LoginHeader from './src/components/Login/Header';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import AddExpense from './src/screens/AddExpense';
 import LaunchScreen from './src/screens/LaunchScreen';
@@ -12,6 +11,7 @@ import SignupScreen from './src/screens/SignupScreen';
 import store from './src/redux/store';
 import { Provider } from 'react-redux';
 import FlashMessage from 'react-native-flash-message';
+import LoginSignUpHeader from './src/components/Header/LoginSignupHeader';
 const NativeStack = createNativeStackNavigator();
 function App() {
   return (
@@ -26,7 +26,9 @@ function App() {
             />
             <NativeStack.Screen
               options={{
-                header: ({ navigation }) => <LoginHeader navigation={navigation} />,
+                header: ({ navigation }) => (
+                  <LoginSignUpHeader title="Login" navigation={navigation} />
+                ),
               }}
               name={ScreenNames.LOGIN_SCREEN}
               component={Login}
@@ -48,7 +50,11 @@ function App() {
             />
             <NativeStack.Screen
               name={ScreenNames.SIGNUP_SCREEN}
-              options={{ headerShown: false }}
+              options={{
+                header: ({ navigation }) => (
+                  <LoginSignUpHeader title="Sign Up" navigation={navigation} />
+                ),
+              }}
               component={SignupScreen}
             />
           </NativeStack.Navigator>

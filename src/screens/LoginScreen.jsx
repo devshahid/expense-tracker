@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { userLogin } from '../redux/slices/users';
 const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { token, isLoading } = useSelector(state => state.userDetails);
+  const { token } = useSelector(state => state.userDetails);
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '80%',
-    height: 40,
+    height: 50,
     borderColor: 'gray',
     borderWidth: 1,
     marginTop: 10,

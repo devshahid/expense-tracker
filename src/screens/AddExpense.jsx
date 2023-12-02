@@ -282,6 +282,7 @@ const AddExpense = ({ navigation }) => {
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
+        maximumDate={new Date()}
       />
     </View>
   );
