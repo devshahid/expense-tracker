@@ -2,10 +2,9 @@ import { View, Text, StyleSheet } from 'react-native';
 import React from 'react';
 import Icon5 from 'react-native-vector-icons/FontAwesome5';
 import { getTransactionItem } from '../../constants/data';
-import moment from 'moment';
 import { Colours } from '../../constants/constant';
 
-const TransactionList = props => {
+const TransactionList = (props) => {
   const { name, category, amount, date, isExpense } = props;
   const [transactionDate, transactionMonth] = date.split(' ')[0].split('-');
   const { icon, color, backgroundColor } = getTransactionItem(category);

@@ -2,7 +2,7 @@ import { openDatabase } from 'react-native-sqlite-storage';
 const db = openDatabase(
   { name: 'transactions.db' },
   () => {},
-  error => {
+  (error) => {
     console.log(error);
   },
 );

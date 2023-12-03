@@ -5,7 +5,8 @@ import DocumentPicker from 'react-native-document-picker';
 import SQLite from '../sqlite/sql';
 import { showMessage } from 'react-native-flash-message';
 import { FileSystem } from 'react-native-file-access';
-export const storeDataInStorage = async query => {
+export const storeDataInStorage = async (query) => {
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       if (Platform.OS === 'android') {
@@ -18,7 +19,7 @@ export const storeDataInStorage = async query => {
           const storagePath = await writeData(query, `${tempDir}`);
           if (storagePath) {
             // copying file from temp location to download directory
-            await FileSystem.cpExternal(storagePath, `storageFile.sql`, 'downloads');
+            await FileSystem.cpExternal(storagePath, 'storageFile.sql', 'downloads');
             await FileSystem.unlink(storagePath);
             const [path] = storagePath.split('com');
             const filePath = `${path}downloads/storageFile.sql`;
@@ -68,7 +69,7 @@ export const importDataFromFile = async () => {
     console.log(error);
   }
 };
-const checkPermission = async permission => {
+const checkPermission = async (permission) => {
   const status = await check(permission);
   console.log('status => ', status);
   if (status == RESULTS.GRANTED) {
@@ -84,37 +85,6 @@ const checkPermission = async permission => {
   }
 };
 
-const isDirExist = async dirPath => {
-  return new Promise(async (resolve, reject) => {
-    if (!dirPath) {
-      reject('Directory path not present');
-    } else {
-      RNFS.readDir(dirPath)
-        .then(() => resolve(true))
-        .catch(() => resolve(false));
-    }
-  });
-};
-
-const createDir = async dirPath => {
-  return new Promise((resolve, reject) => {
-    if (!dirPath) {
-      reject('Directory path not present');
-    } else {
-      console.log('creating Dir => ', dirPath);
-      RNFS.mkdir(dirPath)
-        .then(data => {
-          console.log('data => ', data);
-          resolve(true);
-        })
-        .catch(error => {
-          console.log('error => ', error);
-          resolve(false);
-        });
-    }
-  });
-};
-
 const writeData = async (query, dirPath) => {
   return new Promise((resolve, reject) => {
     if (Array.isArray(query) && query.length > 0) {
@@ -127,7 +97,7 @@ const writeData = async (query, dirPath) => {
           console.log('Data exported to SQL file:', dirPath);
           resolve(dirPath);
         })
-        .catch(error => {
+        .catch((error) => {
           console.log('Error exporting data:', error);
           reject(error);
         });
@@ -135,21 +105,17 @@ const writeData = async (query, dirPath) => {
   });
 };
 
-const parseQuery = async query => {
-  try {
-    if (Array.isArray(query) && query.length > 0) {
-      const queries = query.map(item => {
-        return SQLite.parseDataFromFile(item);
-      });
-      const data = await Promise.all(queries);
-      console.log('multiple data => ', data, typeof data);
-      return data.length > 0 ? true : false;
-    } else {
-      const data = await SQLite.parseDataFromFile(query);
-      console.log('single data => ', data, typeof data);
-      return data === 1 ? true : false;
-    }
-  } catch (error) {
-    throw error;
+const parseQuery = async (query) => {
+  if (Array.isArray(query) && query.length > 0) {
+    const queries = query.map((item) => {
+      return SQLite.parseDataFromFile(item);
+    });
+    const data = await Promise.all(queries);
+    console.log('multiple data => ', data, typeof data);
+    return data.length > 0 ? true : false;
+  } else {
+    const data = await SQLite.parseDataFromFile(query);
+    console.log('single data => ', data, typeof data);
+    return data === 1 ? true : false;
   }
 };

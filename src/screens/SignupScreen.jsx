@@ -3,12 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { Image } from 'react-native';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { Images, ScreenNames } from '../constants/constant';
-import ENV_VAR from '../config/config';
-import { resetUserDetails, userRegister } from '../redux/slices/users';
+import { resetUserDetails, userLogin, userRegister } from '../redux/slices/users';
 import { useSelector, useDispatch } from 'react-redux';
 const SignupScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { message } = useSelector(state => state.userDetails);
+  const { message } = useSelector((state) => state.userDetails);
   const [userDetails, setUserDetails] = useState({
     name: '',
     email: '',
@@ -24,7 +23,7 @@ const SignupScreen = ({ navigation }) => {
     return () => {
       dispatch(resetUserDetails()); // Define and dispatch this action to reset the flag
     };
-  }, [message]);
+  }, [dispatch, message, navigation]);
 
   const handleFormData = (value, name) => {
     setUserDetails({
@@ -83,7 +82,7 @@ const SignupScreen = ({ navigation }) => {
               placeholderTextColor="#696969"
               autoCapitalize="none"
               value={userDetails.name}
-              onChangeText={value => handleFormData(value, 'name')}
+              onChangeText={(value) => handleFormData(value, 'name')}
             />
             <TextInput
               style={styles.input}
@@ -92,7 +91,7 @@ const SignupScreen = ({ navigation }) => {
               keyboardType="email-address"
               autoCapitalize="none"
               value={userDetails.email}
-              onChangeText={value => handleFormData(value, 'email')}
+              onChangeText={(value) => handleFormData(value, 'email')}
             />
             <TextInput
               style={styles.input}
@@ -100,7 +99,7 @@ const SignupScreen = ({ navigation }) => {
               placeholderTextColor="#696969"
               keyboardType="numeric"
               value={userDetails.mobileNumber}
-              onChangeText={value => handleFormData(value, 'mobileNumber')}
+              onChangeText={(value) => handleFormData(value, 'mobileNumber')}
             />
             <TextInput
               style={styles.input}
@@ -108,7 +107,7 @@ const SignupScreen = ({ navigation }) => {
               placeholderTextColor="#696969"
               secureTextEntry
               value={userDetails.password}
-              onChangeText={value => handleFormData(value, 'password')}
+              onChangeText={(value) => handleFormData(value, 'password')}
             />
             <TextInput
               style={styles.input}
@@ -116,7 +115,7 @@ const SignupScreen = ({ navigation }) => {
               placeholderTextColor="#696969"
               secureTextEntry
               value={userDetails.cpassword}
-              onChangeText={value => handleFormData(value, 'cpassword')}
+              onChangeText={(value) => handleFormData(value, 'cpassword')}
             />
           </View>
         </View>
@@ -216,7 +215,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F1F5F6',
     borderRadius: 10,
-    paddingVertical: 5,
     marginTop: 20,
     width: '80%',
     flexDirection: 'row',

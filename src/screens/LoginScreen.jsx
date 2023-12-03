@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { userLogin } from '../redux/slices/users';
 const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { token } = useSelector(state => state.userDetails);
+  const { token } = useSelector((state) => state.userDetails);
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__
@@ -35,7 +35,7 @@ const Login = ({ navigation, route }) => {
     if (token) {
       navigation.replace(ScreenNames.MAIN_SCREEN);
     }
-  }, [token]);
+  }, [navigation, token]);
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
@@ -103,7 +103,7 @@ const Login = ({ navigation, route }) => {
               keyboardType="email-address"
               autoCapitalize="none"
               value={userDetails.email}
-              onChangeText={value => handleFormData(value, 'email')}
+              onChangeText={(value) => handleFormData(value, 'email')}
             />
             <TextInput
               style={styles.input}
@@ -111,7 +111,7 @@ const Login = ({ navigation, route }) => {
               placeholderTextColor="#696969"
               secureTextEntry
               value={userDetails.password}
-              onChangeText={value => handleFormData(value, 'password')}
+              onChangeText={(value) => handleFormData(value, 'password')}
             />
           </View>
           <View style={styles.forgotPsdContainer}>
@@ -135,7 +135,7 @@ const Login = ({ navigation, route }) => {
           <Text style={styles.loginWithGoogleText}>Login with Google</Text>
         </TouchableOpacity>
         <View style={styles.signupTextContainer}>
-          <Text style={styles.signUpMainText}>Don't have an account yet? </Text>
+          <Text style={styles.signUpMainText}>Don&apos;t have an account yet? </Text>
           <TouchableOpacity onPress={handleNavigation}>
             <Text style={styles.signupText}>Sign Up</Text>
           </TouchableOpacity>
@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F1F5F6',
     borderRadius: 10,
-    paddingVertical: 5,
     marginTop: 20,
     width: '80%',
     flexDirection: 'row',

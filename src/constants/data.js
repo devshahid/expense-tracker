@@ -110,10 +110,10 @@ export const transactionItems = {
     backgroundColor: '#F5DEB3',
   },
 };
-export const getTransactionItem = category => {
+export const getTransactionItem = (category) => {
   return { ...transactionItems[category] };
 };
 
-export const checkPaymentMode = payMode => {
-  return paymentOptions.find(item => item.value === payMode);
+export const checkPaymentMode = (payMode) => {
+  return paymentOptions.find((item) => item.value === payMode);
 };

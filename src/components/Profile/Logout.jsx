@@ -8,7 +8,7 @@ import ProfileModal from '../Modal/ProfileModal';
 import ActivityLoader from '../Loaders/ActivityLoader';
 
 const Logout = ({ state, setLogout, navigation }) => {
-  const { isLoading } = useSelector(state => state.userDetails);
+  const { isLoading } = useSelector((state) => state.userDetails);
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {

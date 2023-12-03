@@ -10,8 +10,8 @@ import { showMessage } from 'react-native-flash-message';
 
 const AddBalance = ({ state, setAddBalance }) => {
   const dispatch = useDispatch();
-  const { userId } = useSelector(state => state.userDetails);
-  const { transactionAdded, bankAmount, cashAmount } = useSelector(state => state.transactions);
+  const { userId } = useSelector((state) => state.userDetails);
+  const { transactionAdded, bankAmount, cashAmount } = useSelector((state) => state.transactions);
   const [amountDetails, setAmountDetails] = useState({
     select: 'Bank',
     amount: 0,
@@ -34,6 +34,7 @@ const AddBalance = ({ state, setAddBalance }) => {
       });
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, transactionAdded]);
   const handleInputs = (value, name) => {
     setAmountDetails({
@@ -63,13 +64,13 @@ const AddBalance = ({ state, setAddBalance }) => {
         placeholderTextColor={'#000000'}
         style={[styles.amountValue]}
         keyboardType="numeric"
-        onChangeText={value => handleInputs(Number(value), 'amount')}
+        onChangeText={(value) => handleInputs(Number(value), 'amount')}
       />
       <View style={styles.pickerViewContainer}>
         <Picker
           style={styles.pickerContainer}
           selectedValue={amountDetails.select}
-          onValueChange={option => {
+          onValueChange={(option) => {
             handleInputs(option, 'select');
           }}
           dropdownIconColor="#000000">

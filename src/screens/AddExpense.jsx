@@ -6,15 +6,15 @@ import moment from 'moment';
 import { categoryOptions, paymentOptions } from '../constants/data';
 import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { Colours, ScreenNames, tableNames } from '../constants/constant';
+import { Colours, ScreenNames } from '../constants/constant';
 import Snackbar from 'react-native-snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
 import { showMessage } from 'react-native-flash-message';
 const AddExpense = ({ navigation }) => {
-  const { userId } = useSelector(state => state.userDetails);
+  const { userId } = useSelector((state) => state.userDetails);
   const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message } = useSelector(
-    state => state.transactions,
+    (state) => state.transactions,
   );
   const dispatch = useDispatch();
   const [selectedBox, setSelectedBox] = useState('debit');
@@ -33,7 +33,7 @@ const AddExpense = ({ navigation }) => {
     isExpense: true,
     isSynced: 0,
   });
-  const checkEmptyInput = value => {
+  const checkEmptyInput = (value) => {
     if (value) return true;
     else return false;
   };
@@ -75,7 +75,7 @@ const AddExpense = ({ navigation }) => {
     return () => {
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
     };
-  }, [dispatch, transactionAdded, message]);
+  }, [dispatch, transactionAdded, message, navigation]);
   const handleInputs = (value, name) => {
     setTransactionDetails({
       ...transactionDetails,
@@ -91,7 +91,7 @@ const AddExpense = ({ navigation }) => {
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
-  const handleConfirm = date => {
+  const handleConfirm = (date) => {
     const selectedDate = moment(date).format('DD-MM-YYYY');
     setSelectedDate(selectedDate);
     hideDatePicker();
@@ -114,7 +114,7 @@ const AddExpense = ({ navigation }) => {
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
-  const openModal = type => {
+  const openModal = (type) => {
     setModalVisible(true);
     setModalType(type);
   };
@@ -150,7 +150,7 @@ const AddExpense = ({ navigation }) => {
             placeholderTextColor={'#FCFCFC'}
             style={[styles.amountValue, { fontSize: 60, width: '100%' }]}
             keyboardType="numeric"
-            onChangeText={value => handleInputs(Number(value), 'amount')}
+            onChangeText={(value) => handleInputs(Number(value), 'amount')}
           />
         </View>
       </View>
@@ -160,7 +160,7 @@ const AddExpense = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                onChangeText={value => handleInputs(value, 'name')}
+                onChangeText={(value) => handleInputs(value, 'name')}
                 placeholder="Name"
                 placeholderTextColor={'grey'}
                 value={transactionDetails.name}

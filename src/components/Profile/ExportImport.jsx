@@ -3,14 +3,14 @@ import React from 'react';
 import ProfileModal from '../Modal/ProfileModal';
 import { Colours, tableNames } from '../../constants/constant';
 import { importDataFromFile, storeDataInStorage } from '../../utils/fileStorage';
-import SQLite from '../../sqlite/sql';
+import { SQLite } from '../../sqlite/sql';
 import { useDispatch, useSelector } from 'react-redux';
 import { convertToInsertQuery, convertToUpdateQuery } from '../../utils/convertToQuery';
 import { getUserTransactions } from '../../redux/slices/transactions';
 import { showMessage } from 'react-native-flash-message';
 const ExportImport = ({ state, setState }) => {
   const dispatch = useDispatch();
-  const { userId } = useSelector(state => state.userDetails);
+  const { userId } = useSelector((state) => state.userDetails);
   const handleExportBtn = async () => {
     const userData = await SQLite.getTableData(tableNames.USER_TABLE, userId);
     const transactionData = await SQLite.getTableData(tableNames.TRANSACTION_TABLE, userId);

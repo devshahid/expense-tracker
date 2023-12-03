@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { useSelector } from 'react-redux';
 const ProfileMainCard = () => {
-  const { userName, profilePhoto } = useSelector(state => state.userDetails);
+  const { userName, profilePhoto } = useSelector((state) => state.userDetails);
   return (
     <View style={styles.profileMainCardContainer}>
       <View style={styles.profileImageConatiner}>

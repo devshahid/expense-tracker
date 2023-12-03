@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import React, { useState, useRef, useEffect } from 'react';
 import { Colours, ScreenNames, onboardingSlides } from '../constants/constant';
-import SQLite from '../sqlite/sql';
+import { SQLite } from '../sqlite/sql';
 const { width, height } = Dimensions.get('window');
 const Slide = ({ item }) => {
   return (
@@ -67,7 +67,7 @@ const OnboardingScreen = ({ navigation }) => {
       </View>
     );
   };
-  const updateCurrentSlideIndex = e => {
+  const updateCurrentSlideIndex = (e) => {
     const contentOffSetX = e.nativeEvent.contentOffset.x;
     const currentIndex = Math.round(contentOffSetX / width);
     setSliderIndex(currentIndex);
