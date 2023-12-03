@@ -1,119 +1,99 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { Image } from 'react-native';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import { Images, ScreenNames } from '../constants/constant';
-import Snackbar from 'react-native-snackbar';
+import { Colours, Images, ScreenNames } from '../constants/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogin } from '../redux/slices/users';
+import HorizontalOR from '../components/HorizontalOR';
+import GoogleLoginBtn from '../components/GoogleLoginBtn';
+import LoginSignupBottomText from '../components/LoginSignupBottomText';
+import { loginSignupStyle } from '../common-styles/loginSignup';
+import InputText from '../components/InputText';
+import { toastMessage } from '../utils/toastMessage';
+import { validateInput } from '../utils/loginValidationHandler';
+import { ErrorText } from './SignupScreen';
+
 const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.userDetails);
-  useEffect(() => {
-    GoogleSignin.configure({
-      androidClientId: __DEV__
-        ? process.env.ANDROID_CLIENT_ID
-        : process.env.ANDROID_RELEASE_CLIENT_ID,
-    });
-  }, []);
 
+  // useEffect handler to display toast when registration completed
   useEffect(() => {
     if (route?.params?.success) {
-      Snackbar.show({
-        text: 'REGISTRATION SUCCESSFULL',
-        duration: Snackbar.LENGTH_LONG,
-        marginBottom: 20,
-        backgroundColor: '#3AC279',
-        textColor: '#000000',
-      });
-      setTimeout(() => {
-        Snackbar.dismiss();
-      }, 3000);
+      toastMessage('REGISTRATION SUCCESSFULL', 'success');
     }
   }, [route.params]);
+
+  // handler to navigate the user to main screen when logged in
   useEffect(() => {
     if (token) {
       navigation.replace(ScreenNames.MAIN_SCREEN);
     }
   }, [navigation, token]);
+
+  // defining local state
   const [userDetails, setUserDetails] = useState({
     email: '',
     password: '',
+    isEmailValid: false,
+    isPasswordValid: false,
   });
+
+  // handler to update the state based on user input
   const handleFormData = (value, name) => {
+    const [key, output] = validateInput(name, value);
     setUserDetails({
       ...userDetails,
       [name]: value,
+      [key]: output,
     });
-  };
-  const handleSubmitData = async () => {
-    if (userDetails.email && userDetails.password) {
-      try {
-        dispatch(userLogin(userDetails));
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      console.log('Invalid user');
-    }
-  };
-  const handleGoogleSignIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      const userDetails = {
-        name: userInfo?.user?.name,
-        email: userInfo?.user?.email,
-        isGoogleLogin: true,
-        googleLoginId: userInfo?.user?.id,
-        profilePhoto: userInfo?.user?.photo ?? '',
-      };
-      dispatch(userLogin(userDetails));
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-        // alert('sign in cancelled');
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // alert('sign in progress');
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // alert('sign in not available');
-        // play services not available or outdated
-      } else {
-        // some other error happened
-      }
-    }
-  };
-  const handleNavigation = () => {
-    navigation.navigate(ScreenNames.SIGNUP_SCREEN);
   };
 
   return (
-    <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-      <View style={styles.mainContainer}>
+    <ScrollView style={loginSignupStyle.scrollContainer} keyboardShouldPersistTaps="handled">
+      <View style={loginSignupStyle.mainContainer}>
         <View>
-          <Image source={Images.LOGIN_IMAGE} style={styles.loginImage} />
+          <Image source={Images.LOGIN_IMAGE} style={loginSignupStyle.loginImage} />
         </View>
-        <View style={styles.labelContainer}>
+
+        {/* View for displaying Login input fields and a forget password text */}
+        <View style={loginSignupStyle.labelContainer}>
           <View style={{ alignItems: 'center' }}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter you email"
-              placeholderTextColor="#696969"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={userDetails.email}
-              onChangeText={(value) => handleFormData(value, 'email')}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              placeholderTextColor="#696969"
-              secureTextEntry
-              value={userDetails.password}
-              onChangeText={(value) => handleFormData(value, 'password')}
+            <InputText
+              placeholder="Enter your email"
+              title="email"
+              handleFormData={handleFormData}
+              userDetails={userDetails}
             />
           </View>
+          <View style={loginSignupStyle.errorTxtView}>
+            {!userDetails.isEmailValid && userDetails.email.length > 0 && (
+              <Text style={loginSignupStyle.errorTxt}>Please enter a valid email</Text>
+            )}
+          </View>
+          <View style={{ alignItems: 'center' }}>
+            <InputText
+              placeholder="Enter your password"
+              title="password"
+              handleFormData={handleFormData}
+              userDetails={userDetails}
+            />
+          </View>
+          <View style={loginSignupStyle.errorTxtView}>
+            <ErrorText
+              condition={!userDetails.isPasswordValid && userDetails.password.length > 0}
+              text="Please enter a valid password"
+            />
+
+            <ErrorText
+              condition={
+                userDetails.isPasswordValid &&
+                userDetails.password.length > 0 &&
+                userDetails.password.length < 8
+              }
+              text="Please enter a password with at least 8 characters"
+            />
+          </View>
+
           <View style={styles.forgotPsdContainer}>
             <TouchableOpacity>
               <Text style={styles.forgotPsdTxt}>Forgot Password?</Text>
@@ -121,25 +101,33 @@ const Login = ({ navigation, route }) => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleSubmitData}>
-          <Text style={styles.loginButtonText}>Login</Text>
+        <TouchableOpacity
+          disabled={!userDetails.isEmailValid || !userDetails.isPasswordValid}
+          style={[
+            loginSignupStyle.loginButton,
+            {
+              backgroundColor:
+                userDetails.isEmailValid && userDetails.isPasswordValid
+                  ? Colours.PURPLE_THEME
+                  : Colours.GREY_WHITE,
+            },
+          ]}
+          onPress={() => dispatch(userLogin(userDetails))}>
+          <Text style={loginSignupStyle.loginButtonText}>Login</Text>
         </TouchableOpacity>
-        <View style={styles.orContainer}>
-          <View style={styles.horizontalDiv} />
-          <Text style={styles.orText}>OR</Text>
-          <View style={styles.horizontalDiv} />
-        </View>
 
-        <TouchableOpacity style={styles.loginWithGoogleContainer} onPress={handleGoogleSignIn}>
-          <Image style={styles.googleIconContainer} source={Images.GOOGLE_IMAGE} />
-          <Text style={styles.loginWithGoogleText}>Login with Google</Text>
-        </TouchableOpacity>
-        <View style={styles.signupTextContainer}>
-          <Text style={styles.signUpMainText}>Don&apos;t have an account yet? </Text>
-          <TouchableOpacity onPress={handleNavigation}>
-            <Text style={styles.signupText}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
+        {/* ---------- OR ------- component */}
+        <HorizontalOR />
+
+        {/* Google Login button */}
+        <GoogleLoginBtn />
+
+        {/* Bottom text to switch b/w register and login */}
+        <LoginSignupBottomText
+          navigation={navigation}
+          title="Don't have an account yet? "
+          navigateBtn="Sign Up"
+        />
       </View>
     </ScrollView>
   );
@@ -148,60 +136,6 @@ const Login = ({ navigation, route }) => {
 export default Login;
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    backgroundColor: '#FFFFFF',
-    marginBottom: 20,
-  },
-  mainContainer: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  loginImage: {
-    width: 380,
-    height: 350,
-    borderWidth: 2,
-  },
-  labelContainer: {
-    flex: 1,
-    width: '100%',
-    marginVertical: 0,
-    paddingVertical: 10,
-  },
-  input: {
-    width: '80%',
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginTop: 10,
-    paddingHorizontal: 10,
-    color: '#000000',
-    margin: 10,
-    borderRadius: 10,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  buttonContainer: {
-    width: '80%',
-    margin: 20,
-    backgroundColor: '#000000',
-  },
-  loginButton: {
-    flex: 1,
-    backgroundColor: '#7F3DFF',
-    borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    marginTop: 20,
-    width: '80%',
-    alignItems: 'center',
-    elevation: 1,
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   forgotPsdContainer: {
     alignItems: 'flex-end',
     paddingHorizontal: 20,
@@ -211,70 +145,5 @@ const styles = StyleSheet.create({
   forgotPsdTxt: {
     color: '#7F3DFF',
     fontWeight: '600',
-  },
-  loginWithGoogleContainer: {
-    flex: 1,
-    backgroundColor: '#F1F5F6',
-    borderRadius: 10,
-    marginTop: 20,
-    width: '80%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    borderColor: '#D9DBE4',
-    elevation: 1,
-  },
-  googleIconContainer: {
-    width: 50,
-    height: 30,
-    paddingVertical: 5,
-  },
-  googleLoginTxtContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginWithGoogleText: {
-    color: '#000000',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginLeft: 20,
-  },
-  orContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    width: '80%',
-  },
-  horizontalDiv: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#999',
-  },
-  orText: {
-    marginHorizontal: 10,
-    color: '#999',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  signupTextContainer: {
-    marginTop: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  signUpMainText: {
-    color: '#333',
-    fontSize: 14,
-  },
-  signupText: {
-    color: '#7F3DFF',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-    fontSize: 14,
   },
 });

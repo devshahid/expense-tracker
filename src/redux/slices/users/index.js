@@ -11,6 +11,7 @@ const initialState = {
   error: null,
   message: null,
   profilePhoto: null,
+  status: false,
 };
 
 export const userLogin = createAsyncThunk('userLogin', async (userDetails, { rejectWithValue }) => {
@@ -45,7 +46,7 @@ export const userRegister = createAsyncThunk(
       const { userData, status, message } = response.data;
       console.log(response.data);
       if (response.status === 201 && status && userData._id) {
-        return message;
+        return { message, status, userData };
       } else {
         return message;
       }
@@ -80,6 +81,7 @@ export const userDetailSlice = createSlice({
       state.isLoading = false;
       state.error = null;
       state.message = null;
+      state.status = false;
     },
   },
   extraReducers: (builder) => {
@@ -117,6 +119,7 @@ export const userDetailSlice = createSlice({
     builder.addCase(userRegister.fulfilled, (state, action) => {
       if (action.payload) {
         state.message = action.payload.message;
+        state.status = action.payload.status;
       } else {
         state.error = action.payload;
       }
@@ -124,6 +127,7 @@ export const userDetailSlice = createSlice({
     builder.addCase(userRegister.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
+      state.status = false;
     });
   },
 });
