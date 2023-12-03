@@ -15,20 +15,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  dots: {
-    width: 56,
-    height: 31.4,
-    position: 'relative',
-  },
-  dot: {
-    width: 13.4,
-    height: 13.4,
-    borderRadius: 50,
-    backgroundColor: '#474bff',
-    position: 'absolute',
-    left: 0,
-    top: 0,
-  },
 });
 
 export default ActivityLoader;

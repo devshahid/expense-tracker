@@ -11,6 +11,22 @@ import Snackbar from 'react-native-snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
 import { showMessage } from 'react-native-flash-message';
+
+const PaymentAndCategoryContainer = ({ openModal, transactionDetails, type }) => {
+  const dataType =
+    type === 'Payment' ? transactionDetails.paymentMode : transactionDetails.category;
+  return (
+    <View style={styles.dropdownContainer}>
+      <TouchableOpacity
+        onPress={() => openModal(type)}
+        style={[styles.dropdown, styles.dropDownWithArrow]}>
+        <Text style={styles.selectedTextStyle}>{dataType}</Text>
+        <Icon name="chevron-down" size={20} style={styles.iconStyle} />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 const AddExpense = ({ navigation }) => {
   const { userId } = useSelector((state) => state.userDetails);
   const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message } = useSelector(
@@ -34,8 +50,9 @@ const AddExpense = ({ navigation }) => {
     isSynced: 0,
   });
   const checkEmptyInput = (value) => {
-    if (value) return true;
-    else return false;
+    if (value && value !== 'Payment Mode' && value !== 'Select Category') {
+      return true;
+    } else return false;
   };
   useEffect(() => {
     const { userId, name, amount, paymentMode, category } = transactionDetails;
@@ -213,22 +230,20 @@ const AddExpense = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.dropdownContainer}>
-            <TouchableOpacity
-              onPress={() => openModal('Payment')}
-              style={[styles.dropdown, styles.dropDownWithArrow]}>
-              <Text style={styles.selectedTextStyle}>{transactionDetails.paymentMode}</Text>
-              <Icon name="chevron-down" size={20} style={styles.iconStyle} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.dropdownContainer}>
-            <TouchableOpacity
-              onPress={() => openModal('Category')}
-              style={[styles.dropdown, styles.dropDownWithArrow]}>
-              <Text style={styles.selectedTextStyle}>{transactionDetails.category}</Text>
-              <Icon name="chevron-down" size={20} style={styles.iconStyle} />
-            </TouchableOpacity>
-          </View>
+
+          {/* DropDown container for payment mode */}
+          <PaymentAndCategoryContainer
+            openModal={openModal}
+            type="Payment"
+            transactionDetails={transactionDetails}
+          />
+
+          {/* DropDown container for category */}
+          <PaymentAndCategoryContainer
+            openModal={openModal}
+            type="Category"
+            transactionDetails={transactionDetails}
+          />
 
           <View style={{ width: '100%' }}>
             <TouchableOpacity style={styles.selectDateContainer} onPress={handleDateVisibility}>
