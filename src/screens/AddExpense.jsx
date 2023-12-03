@@ -10,6 +10,7 @@ import { Colours, ScreenNames, tableNames } from '../constants/constant';
 import Snackbar from 'react-native-snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
+import { showMessage } from 'react-native-flash-message';
 const AddExpense = ({ navigation }) => {
   const { userId } = useSelector(state => state.userDetails);
   const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message } = useSelector(
@@ -19,9 +20,8 @@ const AddExpense = ({ navigation }) => {
   const [selectedBox, setSelectedBox] = useState('debit');
   const [selectedHeaderTxt, setSelectedHeaderTxt] = useState('Expense');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const date = Date.now();
-  const formattedDate = moment(date);
-  const [selectedDate, setSelectedDate] = useState(moment(formattedDate).format('DD-MM-YYYY'));
+  const date = new Date();
+  const [selectedDate, setSelectedDate] = useState(moment(date).format('DD-MM-YYYY'));
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [transactionDetails, setTransactionDetails] = useState({
     userId: userId,
@@ -29,7 +29,7 @@ const AddExpense = ({ navigation }) => {
     amount: 0,
     paymentMode: 'Payment Mode',
     category: 'Select Category',
-    date: moment(selectedDate, 'DD-MM-YYYY').toISOString(),
+    date: selectedDate,
     isExpense: true,
     isSynced: 0,
   });
@@ -65,6 +65,12 @@ const AddExpense = ({ navigation }) => {
       }, 5000);
     } else if (transactionAdded) {
       navigation.navigate(ScreenNames.HOME_TAB, { isData: true });
+      showMessage({
+        message: 'Transaction Added',
+        type: 'success',
+        duration: 2500,
+        icon: 'success',
+      });
     }
     return () => {
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
@@ -89,24 +95,22 @@ const AddExpense = ({ navigation }) => {
     const selectedDate = moment(date).format('DD-MM-YYYY');
     setSelectedDate(selectedDate);
     hideDatePicker();
-    handleFormData('date', date);
+    handleFormData('date', selectedDate);
   };
   const handleDateVisibility = () => {
     setDatePickerVisibility(!isDatePickerVisible);
   };
   const handleSubmit = async () => {
-    const isoDate = moment(selectedDate, 'DD-MM-YYYY').toISOString();
+    const timeNow = moment(date).format('HH:mm');
     const newData = {
       ...transactionDetails,
-      date: isoDate,
+      date: `${transactionDetails.date} ${timeNow}`,
       bankAmount,
       cashAmount,
       incomeBal,
       expenseBal,
     };
-    // const response = await SQLite.insertData(newData);
     dispatch(AddOneTrasaction(newData));
-    // await SQLite.updateUserDetails(tableNames.USER_TABLE, {userId : transactionDetails.userId, bankAmount: 0, cashAmount :0 })
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
@@ -251,7 +255,7 @@ const AddExpense = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-        {modalType === 'Category' ? (
+        {modalType === 'Category' && (
           <DropdownContainer
             type="Category"
             options={categoryOptions}
@@ -260,7 +264,9 @@ const AddExpense = ({ navigation }) => {
             transactionDetails={transactionDetails}
             setTransactionDetails={setTransactionDetails}
           />
-        ) : (
+        )}
+
+        {modalType === 'Payment' && (
           <DropdownContainer
             type="Payment"
             options={paymentOptions}
@@ -276,6 +282,7 @@ const AddExpense = ({ navigation }) => {
         mode="date"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
+        maximumDate={new Date()}
       />
     </View>
   );

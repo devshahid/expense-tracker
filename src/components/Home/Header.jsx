@@ -8,13 +8,12 @@ import SQLite from '../../sqlite/sql';
 import { useSelector } from 'react-redux';
 const HeaderComponent = () => {
   const [userData, setUserData] = useState(null);
-  const globalState = useSelector(state => state.userDetails);
+  const { userId, profilePhoto } = useSelector(state => state.userDetails);
   useEffect(() => {
     async function getUserInfo() {
       try {
-        const userInfo = JSON.parse(await AsyncStorage.getItem('userData'));
-        if (userInfo?.photo) {
-          setUserData(userInfo.photo);
+        if (profilePhoto?.length > 0) {
+          setUserData(profilePhoto);
         }
       } catch (error) {
         console.log(error);
@@ -58,8 +57,8 @@ const HeaderComponent = () => {
       <TouchableOpacity
         onPress={async () => [
           console.log(await SQLite.getAllTables()),
-          console.log(await SQLite.getTableData(tableNames.TRANSACTION_TABLE, globalState.userId)),
-          console.log(await SQLite.getTableData(tableNames.USER_TABLE, globalState.userId)),
+          console.log(await SQLite.getTableData(tableNames.TRANSACTION_TABLE, userId)),
+          console.log(await SQLite.getTableData(tableNames.USER_TABLE, userId)),
         ]}>
         <Icon name="bell" size={30} style={{ color: Colours.PURPLE_THEME }} />
       </TouchableOpacity>

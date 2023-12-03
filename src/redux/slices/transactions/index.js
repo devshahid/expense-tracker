@@ -3,6 +3,7 @@ import { tableNames } from '../../../constants/constant';
 import SQLite from '../../../sqlite/sql';
 import moment from 'moment';
 import { checkPaymentMode } from '../../../constants/data';
+import { getMonthlyData, getTodayData, getWeeklyData } from '../../../utils/getGraphData';
 const initialState = {
   isLoading: false,
   message: null,
@@ -12,6 +13,9 @@ const initialState = {
   cashAmount: 0,
   incomeBal: 0,
   expenseBal: 0,
+  dailyAmountArr: [0, 0, 0, 0, 0, 0],
+  weeklyAmountArr: [0, 0, 0, 0, 0, 0, 0],
+  monthlyAmountArr: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 };
 
 export const updateUserAmount = createAsyncThunk(
@@ -43,7 +47,7 @@ export const getUserTransactions = createAsyncThunk(
       let expense = 0;
       transactionList.length > 0 &&
         transactionList.map(item => {
-          const month = moment(item.date).format('MM');
+          const month = item.date.split('-')[1];
           if (month === currMonth) {
             if (item.isExpense === 0) {
               income += Number(item.amount);
@@ -52,13 +56,21 @@ export const getUserTransactions = createAsyncThunk(
             }
           }
         });
-      return {
-        transactionList,
+      const obj = {
         income,
         expense,
         bankAmount: bankAmount ?? 0,
         cashAmount: cashAmount ?? 0,
       };
+      if (Array.isArray(transactionList) && !transactionList.message) {
+        obj.transactionList = transactionList;
+        obj.dailyAmountArr = getTodayData(transactionList);
+        obj.weeklyAmountArr = getWeeklyData(transactionList);
+        obj.monthlyAmountArr = getMonthlyData(transactionList);
+      } else {
+        obj.message = transactionList.message;
+      }
+      return obj;
     } catch (error) {
       return rejectWithValue(error);
     }
@@ -132,6 +144,11 @@ export const transactionDetailsSlice = createSlice({
       state.transactionAdded = false;
       state.message = null;
     },
+    updateAmountArr: (state, action) => {
+      state.dailyAmountArr = getTodayData(action.payload);
+      state.weeklyAmountArr = getWeeklyData(action.payload);
+      state.monthlyAmountArr = getMonthlyData(action.payload);
+    },
   },
   extraReducers: builder => {
     builder.addCase(getUserTransactions.pending, state => {
@@ -139,12 +156,22 @@ export const transactionDetailsSlice = createSlice({
     });
     builder.addCase(getUserTransactions.fulfilled, (state, action) => {
       state.isLoading = false;
-      if (!action.payload.message) {
-        state.transactionList = [...action.payload.transactionList];
-        state.incomeBal = action.payload.income;
-        state.expenseBal = action.payload.expense;
-        state.bankAmount = action.payload.bankAmount;
-        state.cashAmount = action.payload.cashAmount;
+      state.incomeBal = action.payload?.income;
+      state.expenseBal = action.payload?.expense;
+      state.bankAmount = action.payload?.bankAmount;
+      state.cashAmount = action.payload?.cashAmount;
+      state.message = action.payload?.message;
+      if (
+        action.payload.dailyAmountArr &&
+        action.payload.weeklyAmountArr &&
+        action.payload.monthlyAmountArr
+      ) {
+        state.dailyAmountArr = action.payload?.dailyAmountArr;
+        state.weeklyAmountArr = action.payload?.weeklyAmountArr;
+        state.monthlyAmountArr = action.payload?.monthlyAmountArr;
+      }
+      if (action.payload.transactionList) {
+        state.transactionList = [...action.payload?.transactionList];
       }
     });
     builder.addCase(getUserTransactions.rejected, (state, action) => {
@@ -201,6 +228,6 @@ export const transactionDetailsSlice = createSlice({
   },
 });
 
-export const { resetTransactionAdded } = transactionDetailsSlice.actions;
+export const { resetTransactionAdded, updateAmountArr } = transactionDetailsSlice.actions;
 
 export default transactionDetailsSlice.reducer;

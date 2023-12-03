@@ -6,10 +6,9 @@ import { Images, ScreenNames } from '../constants/constant';
 import Snackbar from 'react-native-snackbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { userLogin } from '../redux/slices/users';
-import DotsAnimation from '../components/Loaders/DotLoader';
 const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { token, isLoading } = useSelector(state => state.userDetails);
+  const { token } = useSelector(state => state.userDetails);
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__
@@ -67,6 +66,7 @@ const Login = ({ navigation, route }) => {
         email: userInfo?.user?.email,
         isGoogleLogin: true,
         googleLoginId: userInfo?.user?.id,
+        profilePhoto: userInfo?.user?.photo ?? '',
       };
       dispatch(userLogin(userDetails));
     } catch (error) {
@@ -88,13 +88,6 @@ const Login = ({ navigation, route }) => {
     navigation.navigate(ScreenNames.SIGNUP_SCREEN);
   };
 
-  if (isLoading) {
-    return (
-      <>
-        <DotsAnimation />
-      </>
-    );
-  }
   return (
     <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="handled">
       <View style={styles.mainContainer}>
@@ -177,7 +170,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: '80%',
-    height: 40,
+    height: 50,
     borderColor: 'gray',
     borderWidth: 1,
     marginTop: 10,

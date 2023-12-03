@@ -7,7 +7,7 @@ import { Colours } from '../../constants/constant';
 
 const TransactionList = props => {
   const { name, category, amount, date, isExpense } = props;
-  const selectedDate = moment(date).format('DD-MMM');
+  const [transactionDate, transactionMonth] = date.split(' ')[0].split('-');
   const { icon, color, backgroundColor } = getTransactionItem(category);
   const details =
     isExpense === true || isExpense === 1
@@ -35,7 +35,7 @@ const TransactionList = props => {
             ]}>{`${details.sign} ${amount}`}</Text>
         </View>
         <View>
-          <Text style={styles.transactionTime}>{`${selectedDate}`}</Text>
+          <Text style={styles.transactionTime}>{`${transactionDate}-${transactionMonth}`}</Text>
         </View>
       </View>
     </View>

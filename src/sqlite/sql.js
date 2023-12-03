@@ -23,7 +23,7 @@ class SQL {
       });
     }
   }
-  checkAndCreateUserTable(tableName, userId) {
+  checkAndCreateUserTable(tableName, { userId, userName, profilePhoto }) {
     if (tableName) {
       db.transaction(txn => {
         txn.executeSql(
@@ -34,12 +34,12 @@ class SQL {
             if (res.rows.length == 0) {
               txn.executeSql(`DROP TABLE IF EXISTS ${tableName}`, []);
               txn.executeSql(
-                `CREATE TABLE IF NOT EXISTS ${tableName} (id INTEGER PRIMARY KEY AUTOINCREMENT, userId VARCHAR(50), bankAmount NUMERIC, cashAmount NUMERIC)`,
+                `CREATE TABLE IF NOT EXISTS ${tableName} (id INTEGER PRIMARY KEY AUTOINCREMENT, userId VARCHAR(50), userName VARCHAR(50), bankAmount NUMERIC, cashAmount NUMERIC, profilePhoto VARCHAR(50))`,
                 [],
               );
               txn.executeSql(
-                `INSERT INTO ${tableName}(userId, bankAmount, cashAmount) VALUES(?,?,?)`,
-                [userId, 0, 0],
+                `INSERT INTO ${tableName}(userId, userName, bankAmount, cashAmount, profilePhoto) VALUES(?,?,?,?,?)`,
+                [userId, userName, 0, 0, profilePhoto],
                 (tx, res) => {
                   res.rowsAffected ? resolve(res.rowsAffected) : 'no rows affected';
                 },
@@ -179,6 +179,23 @@ class SQL {
             }
           },
           (tx, error) => {
+            reject(error);
+          },
+        );
+      });
+    });
+  }
+  async parseDataFromFile(query) {
+    return new Promise((resolve, reject) => {
+      db.transaction(txn => {
+        txn.executeSql(
+          query,
+          [],
+          (tx, res) => {
+            res.rowsAffected ? resolve(res.rowsAffected) : resolve({ message: 'no rows affected' });
+          },
+          (tx, error) => {
+            console.log('error => ', error);
             reject(error);
           },
         );

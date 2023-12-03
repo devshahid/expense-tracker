@@ -1,17 +1,23 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-
+import { useSelector } from 'react-redux';
 const ProfileMainCard = () => {
+  const { userName, profilePhoto } = useSelector(state => state.userDetails);
   return (
     <View style={styles.profileMainCardContainer}>
       <View style={styles.profileImageConatiner}>
         <Image
-          source={{ uri: 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg' }}
+          source={{
+            uri:
+              profilePhoto?.length > 0
+                ? profilePhoto
+                : 'https://cdn.pixabay.com/photo/2016/03/31/19/56/avatar-1295397_1280.png',
+          }}
           style={styles.profileUserImage}
         />
       </View>
       <View>
-        <Text style={styles.profileNameTxt}>Shahid Qureshi</Text>
+        <Text style={styles.profileNameTxt}>{userName}</Text>
       </View>
     </View>
   );

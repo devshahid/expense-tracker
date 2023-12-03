@@ -7,8 +7,9 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Colours } from '../../constants/constant';
+import { Image } from 'react-native';
 
 const DropdownContainer = ({
   visible,
@@ -19,15 +20,24 @@ const DropdownContainer = ({
   type,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [filteredItems, setFilteredItems] = useState('');
+  const [categoryOption, setCategoryOption] = useState([]);
+  useEffect(() => {
+    if (searchQuery.length > 0) {
+      const lowerCaseSearchQuery = searchQuery.toLowerCase();
+      const filteredOptions = options.filter(option =>
+        option.value.toLowerCase().includes(lowerCaseSearchQuery),
+      );
+      setFilteredItems(filteredOptions);
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setCategoryOption(options);
+  }, [options]);
   const selectedItem =
     type === 'Payment' ? transactionDetails.paymentMode : transactionDetails.category;
 
-  const items = options.map(({ value }) => {
-    return value;
-  });
-  const filteredItems = items.filter(item =>
-    item.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
   const handleItems = item => {
     if (type === 'Payment') {
       setTransactionDetails({
@@ -44,28 +54,21 @@ const DropdownContainer = ({
     setSearchQuery('');
   };
   const renderItems = () => {
-    const renderedItems = filteredItems.map(item => (
+    const itemsToRender = filteredItems.length > 0 ? filteredItems : categoryOption;
+    return itemsToRender.map((option, i) => (
       <TouchableOpacity
-        style={[styles.itemContainer, item === selectedItem && styles.selectedItemContainer]}
-        key={item}
-        onPress={() => handleItems(item)}>
-        <Text style={[styles.itemText, item === selectedItem && styles.selectedItemText]}>
-          {item}
-        </Text>
+        key={i}
+        style={[
+          styles.itemContainer,
+          option.value === selectedItem && styles.selectedItemContainer,
+        ]}
+        onPress={() => handleItems(option.value)}>
+        <View style={styles.categoryItemContainer}>
+          <Text style={styles.itemText}>{option.value}</Text>
+          <Image source={option.img} style={styles.categoryIcon} />
+        </View>
       </TouchableOpacity>
     ));
-
-    if (selectedItem) {
-      const selectedRenderedItem = renderedItems.find(item => item.key === selectedItem);
-
-      if (selectedRenderedItem) {
-        renderedItems.splice(renderedItems.indexOf(selectedRenderedItem), 1);
-
-        renderedItems.unshift(selectedRenderedItem);
-      }
-    }
-
-    return renderedItems;
   };
   return (
     <Modal visible={visible} animationType="fade" transparent>
@@ -137,14 +140,28 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   selectedItemContainer: {
-    backgroundColor: '#e6f2ff',
+    // backgroundColor: Colours.PURPLE_THEME,
+    backgroundColor: '#8262c2',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  categoryItemContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   itemText: {
     fontSize: 18,
     color: Colours.BLACK,
+    fontWeight: '600',
   },
   backDrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.6)',
+  },
+  categoryIcon: {
+    width: 40,
+    height: 40,
   },
 });

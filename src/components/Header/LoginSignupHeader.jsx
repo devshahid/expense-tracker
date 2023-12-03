@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 
-const LoginHeader = () => {
+const LoginSignUpHeader = ({ title }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.loginTxt}>Login</Text>
+      <Text style={styles.loginTxt}>{title}</Text>
     </View>
   );
 };
-export default LoginHeader;
+export default LoginSignUpHeader;
 
 const styles = StyleSheet.create({
   container: {
@@ -24,8 +24,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   loginTxt: {
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: '800',
     textAlign: 'center',
     color: '#000000',
   },

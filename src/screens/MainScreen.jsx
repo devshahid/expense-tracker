@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView, StyleSheet, Dimensions } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -17,6 +17,10 @@ const MainScreen = () => {
         screenOptions={{
           tabBarActiveTintColor: '#7F3DFF',
           tabBarInactiveTintColor: '#C6C6C6',
+          tabBarLabelStyle: {
+            width: '100%',
+            fontSize: 13,
+          },
         }}>
         <Tab.Screen
           name={ScreenNames.HOME_TAB}

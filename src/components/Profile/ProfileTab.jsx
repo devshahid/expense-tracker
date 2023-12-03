@@ -6,11 +6,12 @@ import ProfileItems from './ProfileItems';
 import Logout from './Logout';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import AddBalance from './AddBalance';
+import ExportImport from './ExportImport';
 const ProfileTab = () => {
   const navigation = useNavigation();
   const [logout, setLogout] = useState(false);
   const [addBalance, setAddBalance] = useState(false);
-
+  const [isExportImportOpen, setIsExportImportOpen] = useState(false);
   useEffect(() => {
     GoogleSignin.configure({
       androidClientId: __DEV__
@@ -26,11 +27,20 @@ const ProfileTab = () => {
         <ScrollView>
           <ProfileItems name="Add Balance" iconName="wallet" handler={() => setAddBalance(true)} />
           <ProfileItems name="Settings" iconName="settings" />
-          <ProfileItems name="Export Data" iconName="share" />
+          <ProfileItems
+            name="Import/Export Data"
+            iconName="share"
+            handler={() => setIsExportImportOpen(true)}
+          />
           <ProfileItems name="Log Out" iconName="log-out" handler={() => setLogout(true)} />
         </ScrollView>
         <Logout state={logout} setLogout={setLogout} navigation={navigation} />
         <AddBalance state={addBalance} setAddBalance={setAddBalance} navigation={navigation} />
+        <ExportImport
+          state={isExportImportOpen}
+          setState={setIsExportImportOpen}
+          navigation={navigation}
+        />
       </View>
     </View>
   );

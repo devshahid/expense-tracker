@@ -2,11 +2,13 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { ScreenNames } from '../../constants/constant';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { userLogout } from '../../redux/slices/users';
 import ProfileModal from '../Modal/ProfileModal';
+import ActivityLoader from '../Loaders/ActivityLoader';
 
 const Logout = ({ state, setLogout, navigation }) => {
+  const { isLoading } = useSelector(state => state.userDetails);
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
@@ -17,6 +19,9 @@ const Logout = ({ state, setLogout, navigation }) => {
       console.error(error);
     }
   };
+  if (isLoading) {
+    return <ActivityLoader />;
+  }
   return (
     <ProfileModal state={state} setState={setLogout}>
       <Text style={styles.logOutTitle}>Log Out?</Text>
