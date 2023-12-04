@@ -11,6 +11,7 @@ import Snackbar from 'react-native-snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
 import { showMessage } from 'react-native-flash-message';
+import ActivityLoader from '../components/Loaders/ActivityLoader';
 
 const PaymentAndCategoryContainer = ({ openModal, transactionDetails, type }) => {
   const dataType =
@@ -29,9 +30,8 @@ const PaymentAndCategoryContainer = ({ openModal, transactionDetails, type }) =>
 
 const AddExpense = ({ navigation }) => {
   const { userId } = useSelector((state) => state.userDetails);
-  const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message } = useSelector(
-    (state) => state.transactions,
-  );
+  const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message, isLoading } =
+    useSelector((state) => state.transactions);
   const dispatch = useDispatch();
   const [selectedBox, setSelectedBox] = useState('debit');
   const [selectedHeaderTxt, setSelectedHeaderTxt] = useState('Expense');
@@ -140,6 +140,10 @@ const AddExpense = ({ navigation }) => {
     setModalVisible(false);
     setModalType('');
   };
+
+  if (isLoading) {
+    return <ActivityLoader />;
+  }
   return (
     <View
       style={[

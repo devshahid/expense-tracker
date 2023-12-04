@@ -16,7 +16,7 @@ const TransactionList = (props) => {
     <View style={styles.transactionListContainer}>
       <View style={styles.iconAndTransContainer}>
         <View style={[styles.transactionIcon, { backgroundColor: backgroundColor }]}>
-          <Icon5 name={icon} size={40} style={[{ color: color }, { padding: 10 }]} />
+          <Icon5 name={icon} size={40} style={[{ color: color }, { padding: 5 }]} />
         </View>
         <View style={{ marginHorizontal: 5, padding: 2 }}>
           <Text numberOfLines={1} style={styles.transactionTitle}>
@@ -63,9 +63,10 @@ const styles = StyleSheet.create({
   transactionIcon: {
     marginHorizontal: 5,
     borderRadius: 14,
-    height: 60,
-    width: 60,
+    height: 65,
+    width: 65,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   transactionTitle: {
     fontSize: 16,

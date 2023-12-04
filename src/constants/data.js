@@ -21,6 +21,8 @@ export const categoryOptions = [
   { value: 'Rent', img: require('../assets/rent.png') },
   { value: 'Recharge', img: require('../assets/recharge.png') },
   { value: 'Salary', img: require('../assets/salary.png') },
+  { value: 'Family', img: require('../assets/family.png') },
+  { value: 'Lending', img: require('../assets/lending.png') },
   { value: 'Other', img: require('../assets/other.png') },
 ];
 export const transactionItems = {
@@ -103,6 +105,21 @@ export const transactionItems = {
     icon: 'money-bill-wave',
     color: '#0E6251',
     backgroundColor: '#A2D9CE',
+  },
+  Family: {
+    icon: 'user-friends',
+    color: '#99BEE4',
+    backgroundColor: '#2C3E50',
+  },
+  Lending: {
+    icon: 'money-bill',
+    color: '#25BD2B',
+    backgroundColor: '#ABEBC6',
+  },
+  'User Added': {
+    icon: 'user-plus',
+    color: '#DFE89F',
+    backgroundColor: '#5D1760',
   },
   Other: {
     icon: 'ellipsis-h',
