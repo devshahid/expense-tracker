@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import client from '../../../utils/axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { tableNames } from '../../../constants/constant';
-import SQLite from '../../../sqlite/sql';
+import { SQLite } from '../../../sqlite/sql';
 const initialState = {
   userName: null,
   token: null,
@@ -11,6 +11,7 @@ const initialState = {
   error: null,
   message: null,
   profilePhoto: null,
+  status: false,
 };
 
 export const userLogin = createAsyncThunk('userLogin', async (userDetails, { rejectWithValue }) => {
@@ -45,7 +46,7 @@ export const userRegister = createAsyncThunk(
       const { userData, status, message } = response.data;
       console.log(response.data);
       if (response.status === 201 && status && userData._id) {
-        return message;
+        return { message, status, userData };
       } else {
         return message;
       }
@@ -76,14 +77,15 @@ export const userDetailSlice = createSlice({
         state.profilePhoto = profilePhoto;
       }
     },
-    resetUserDetails: (state, action) => {
+    resetUserDetails: (state) => {
       state.isLoading = false;
       state.error = null;
       state.message = null;
+      state.status = false;
     },
   },
-  extraReducers: builder => {
-    builder.addCase(userLogin.pending, state => {
+  extraReducers: (builder) => {
+    builder.addCase(userLogin.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(userLogin.fulfilled, (state, action) => {
@@ -98,10 +100,10 @@ export const userDetailSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     });
-    builder.addCase(userLogout.pending, state => {
+    builder.addCase(userLogout.pending, (state) => {
       state.isLoading = true;
     });
-    builder.addCase(userLogout.fulfilled, state => {
+    builder.addCase(userLogout.fulfilled, (state) => {
       state.isLoading = false;
       state.token = null;
       state.userId = null;
@@ -111,19 +113,21 @@ export const userDetailSlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     });
-    builder.addCase(userRegister.pending, state => {
+    builder.addCase(userRegister.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(userRegister.fulfilled, (state, action) => {
       if (action.payload) {
         state.message = action.payload.message;
+        state.status = action.payload.status;
       } else {
         state.error = action.payload;
       }
     });
-    builder.addCase(userRegister.rejected, state => {
+    builder.addCase(userRegister.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
+      state.status = false;
     });
   },
 });

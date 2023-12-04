@@ -1,20 +1,33 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, View, TouchableOpacity, ScrollView, Image } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { Image } from 'react-native';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
-import { Images, ScreenNames } from '../constants/constant';
-import ENV_VAR from '../config/config';
+import { Colours, Images, ScreenNames } from '../constants/constant';
 import { resetUserDetails, userRegister } from '../redux/slices/users';
 import { useSelector, useDispatch } from 'react-redux';
+import HorizontalOR from '../components/HorizontalOR';
+import GoogleLoginBtn from '../components/GoogleLoginBtn';
+import LoginSignupBottomText from '../components/LoginSignupBottomText';
+import { loginSignupStyle } from '../common-styles/loginSignup';
+import InputText from '../components/InputText';
+import { validateInput } from '../utils/loginValidationHandler';
+
+export const ErrorText = ({ condition, text }) => {
+  return condition ? <Text style={loginSignupStyle.errorTxt}>{text}</Text> : null;
+};
+
 const SignupScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { message } = useSelector(state => state.userDetails);
+  const { message, status } = useSelector((state) => state.userDetails);
   const [userDetails, setUserDetails] = useState({
     name: '',
     email: '',
     mobileNumber: '',
     password: '',
     cpassword: '',
+    hasName: false,
+    isMobileNumberValid: false,
+    isEmailValid: false,
+    isPasswordValid: false,
+    isPasswordMatched: false,
   });
 
   useEffect(() => {
@@ -24,258 +37,137 @@ const SignupScreen = ({ navigation }) => {
     return () => {
       dispatch(resetUserDetails()); // Define and dispatch this action to reset the flag
     };
-  }, [message]);
+  }, [dispatch, message, navigation]);
 
   const handleFormData = (value, name) => {
+    const [key, output] = validateInput(name, value, userDetails);
     setUserDetails({
       ...userDetails,
       [name]: value,
+      [key]: output,
     });
   };
   const handleSubmitData = async () => {
-    try {
-      dispatch(userRegister(userDetails));
+    dispatch(userRegister(userDetails));
+    if (status === true) {
       navigation.replace(ScreenNames.LOGIN_SCREEN, { success: true });
-    } catch (error) {
-      console.log(error);
     }
   };
-  const handleGoogleSignIn = async () => {
-    try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      const userDetails = {
-        name: userInfo?.user?.name,
-        email: userInfo?.user?.email,
-        isGoogleLogin: true,
-        googleLoginId: userInfo?.user?.id,
-      };
-      dispatch(userLogin(userDetails));
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-        // alert('sign in cancelled');
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // alert('sign in progress');
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // alert('sign in not available');
-        // play services not available or outdated
-      } else {
-        // some other error happened
-      }
-    }
-  };
-  const handleNavigation = () => {
-    navigation.navigate(ScreenNames.LOGIN_SCREEN);
-  };
+
   return (
-    <ScrollView style={styles.scrollContainer} keyboardShouldPersistTaps="handled">
-      <View style={styles.mainContainer}>
+    <ScrollView style={loginSignupStyle.scrollContainer} keyboardShouldPersistTaps="handled">
+      <View style={loginSignupStyle.mainContainer}>
         <View>
-          <Image source={Images.SIGNUP_IMAGE} style={styles.loginImage} />
+          <Image source={Images.SIGNUP_IMAGE} style={loginSignupStyle.loginImage} />
         </View>
-        <View style={styles.labelContainer}>
+
+        {/* write logic to handle all erros at once */}
+        <View style={loginSignupStyle.errorTxtView}>
+          <ErrorText
+            condition={!userDetails.hasName && userDetails.name.length > 0}
+            text="Please enter your name"
+          />
+          <ErrorText
+            condition={!userDetails.isEmailValid && userDetails.email.length > 0}
+            text="Please enter a valid email"
+          />
+          <ErrorText
+            condition={!userDetails.isMobileNumberValid && userDetails.mobileNumber.length > 0}
+            text="Please enter a valid number"
+          />
+          <ErrorText
+            condition={!userDetails.isPasswordValid && userDetails.password.length > 0}
+            text="Please enter a valid password"
+          />
+          <ErrorText
+            condition={
+              !userDetails.isPasswordValid &&
+              userDetails.password.length > 0 &&
+              userDetails.password.length < 8
+            }
+            text="Please enter a password with at least 8 characters"
+          />
+          <ErrorText
+            condition={!userDetails.isPasswordMatched && userDetails.password.length > 0}
+            text="Entered password doesn't matched"
+          />
+        </View>
+        {/* View for displaying Signup input fields */}
+        <View style={loginSignupStyle.labelContainer}>
           <View style={{ alignItems: 'center' }}>
-            <TextInput
-              style={styles.input}
+            <InputText
               placeholder="Enter you full name"
-              placeholderTextColor="#696969"
-              autoCapitalize="none"
-              value={userDetails.name}
-              onChangeText={value => handleFormData(value, 'name')}
+              title="name"
+              handleFormData={handleFormData}
+              userDetails={userDetails}
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Enter you email"
-              placeholderTextColor="#696969"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              value={userDetails.email}
-              onChangeText={value => handleFormData(value, 'email')}
+            <InputText
+              placeholder="Enter your email"
+              title="email"
+              handleFormData={handleFormData}
+              userDetails={userDetails}
             />
-            <TextInput
-              style={styles.input}
+            <InputText
               placeholder="Enter your mobile number"
-              placeholderTextColor="#696969"
-              keyboardType="numeric"
-              value={userDetails.mobileNumber}
-              onChangeText={value => handleFormData(value, 'mobileNumber')}
+              title="mobileNumber"
+              handleFormData={handleFormData}
+              userDetails={userDetails}
             />
-            <TextInput
-              style={styles.input}
+            <InputText
               placeholder="Enter your password"
-              placeholderTextColor="#696969"
-              secureTextEntry
-              value={userDetails.password}
-              onChangeText={value => handleFormData(value, 'password')}
+              title="password"
+              handleFormData={handleFormData}
+              userDetails={userDetails}
             />
-            <TextInput
-              style={styles.input}
+            <InputText
               placeholder="Confirm your password"
-              placeholderTextColor="#696969"
-              secureTextEntry
-              value={userDetails.cpassword}
-              onChangeText={value => handleFormData(value, 'cpassword')}
+              title="cpassword"
+              handleFormData={handleFormData}
+              userDetails={userDetails}
             />
           </View>
         </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleSubmitData}>
-          <Text style={styles.loginButtonText}>Sign Up</Text>
+        <TouchableOpacity
+          disabled={
+            !userDetails.isEmailValid ||
+            !userDetails.isPasswordValid ||
+            !userDetails.isPasswordMatched ||
+            !userDetails.hasName ||
+            !userDetails.isMobileNumberValid
+          }
+          style={[
+            loginSignupStyle.loginButton,
+            {
+              backgroundColor:
+                userDetails.isEmailValid &&
+                userDetails.isPasswordValid &&
+                userDetails.isPasswordMatched &&
+                userDetails.hasName &&
+                userDetails.isMobileNumberValid
+                  ? Colours.PURPLE_THEME
+                  : Colours.GREY_WHITE,
+            },
+          ]}
+          onPress={handleSubmitData}>
+          <Text style={loginSignupStyle.loginButtonText}>Sign Up</Text>
         </TouchableOpacity>
-        <View style={styles.orContainer}>
-          <View style={styles.horizontalDiv} />
-          <Text style={styles.orText}>OR</Text>
-          <View style={styles.horizontalDiv} />
-        </View>
 
-        <TouchableOpacity style={styles.loginWithGoogleContainer} onPress={handleGoogleSignIn}>
-          <Image style={styles.googleIconContainer} source={Images.GOOGLE_IMAGE} />
-          <Text style={styles.loginWithGoogleText}>Login with Google</Text>
-        </TouchableOpacity>
-        <View style={styles.signupTextContainer}>
-          <Text style={styles.signUpMainText}>Already have an account? </Text>
-          <TouchableOpacity onPress={handleNavigation}>
-            <Text style={styles.signupText}>Login</Text>
-          </TouchableOpacity>
-        </View>
+        {/* ---------- OR ------- component */}
+        <HorizontalOR />
+
+        {/* Google Login button */}
+        <GoogleLoginBtn />
+
+        {/* Bottom text to switch b/w register and login */}
+        <LoginSignupBottomText
+          navigation={navigation}
+          title="Already have an account? "
+          navigateBtn="Login"
+        />
       </View>
     </ScrollView>
   );
 };
 
 export default SignupScreen;
-
-const styles = StyleSheet.create({
-  scrollContainer: {
-    backgroundColor: '#FFFFFF',
-    marginBottom: 20,
-  },
-  mainContainer: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  loginImage: {
-    width: 380,
-    height: 350,
-    borderWidth: 2,
-  },
-  labelContainer: {
-    flex: 1,
-    width: '100%',
-    marginVertical: 0,
-    paddingVertical: 10,
-  },
-  input: {
-    width: '80%',
-    height: 50,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginTop: 10,
-    paddingHorizontal: 10,
-    color: '#000000',
-    margin: 10,
-    borderRadius: 10,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  buttonContainer: {
-    width: '80%',
-    margin: 20,
-    backgroundColor: '#000000',
-  },
-  loginButton: {
-    flex: 1,
-    backgroundColor: '#7F3DFF',
-    borderRadius: 10,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    marginTop: 20,
-    width: '80%',
-    alignItems: 'center',
-    elevation: 1,
-  },
-  loginButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  forgotPsdContainer: {
-    alignItems: 'flex-end',
-    paddingHorizontal: 20,
-    marginRight: 20,
-    marginTop: 5,
-  },
-  forgotPsdTxt: {
-    color: '#7F3DFF',
-    fontWeight: '600',
-  },
-  loginWithGoogleContainer: {
-    flex: 1,
-    backgroundColor: '#F1F5F6',
-    borderRadius: 10,
-    paddingVertical: 5,
-    marginTop: 20,
-    width: '80%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderWidth: 1,
-    borderColor: '#D9DBE4',
-    elevation: 1,
-  },
-  googleIconContainer: {
-    width: 50,
-    height: 30,
-    paddingVertical: 5,
-  },
-  googleLoginTxtContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loginWithGoogleText: {
-    color: '#000000',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginLeft: 20,
-  },
-  orContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    width: '80%',
-  },
-  horizontalDiv: {
-    flex: 1,
-    height: 1,
-    backgroundColor: '#999',
-  },
-  orText: {
-    marginHorizontal: 10,
-    color: '#999',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  signupTextContainer: {
-    marginTop: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  signUpMainText: {
-    color: '#333',
-    fontSize: 14,
-  },
-  signupText: {
-    color: '#7F3DFF',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-    fontSize: 14,
-  },
-});

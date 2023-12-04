@@ -25,11 +25,12 @@ const DropdownContainer = ({
   useEffect(() => {
     if (searchQuery.length > 0) {
       const lowerCaseSearchQuery = searchQuery.toLowerCase();
-      const filteredOptions = options.filter(option =>
+      const filteredOptions = options.filter((option) =>
         option.value.toLowerCase().includes(lowerCaseSearchQuery),
       );
       setFilteredItems(filteredOptions);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   useEffect(() => {
@@ -38,7 +39,7 @@ const DropdownContainer = ({
   const selectedItem =
     type === 'Payment' ? transactionDetails.paymentMode : transactionDetails.category;
 
-  const handleItems = item => {
+  const handleItems = (item) => {
     if (type === 'Payment') {
       setTransactionDetails({
         ...transactionDetails,

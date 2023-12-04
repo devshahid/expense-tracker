@@ -3,8 +3,9 @@ const table = 'transactions';
 class SQL {
   checkAndCreateTransTable() {
     if (table) {
-      db.transaction(txn => {
+      db.transaction((txn) => {
         txn.executeSql(
+          // eslint-disable-next-line quotes
           "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
           [table],
           (tx, res) => {
@@ -24,42 +25,45 @@ class SQL {
     }
   }
   checkAndCreateUserTable(tableName, { userId, userName, profilePhoto }) {
-    if (tableName) {
-      db.transaction(txn => {
-        txn.executeSql(
-          "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-          [tableName],
-          (tx, res) => {
-            console.log('item:', res.rows.length);
-            if (res.rows.length == 0) {
-              txn.executeSql(`DROP TABLE IF EXISTS ${tableName}`, []);
-              txn.executeSql(
-                `CREATE TABLE IF NOT EXISTS ${tableName} (id INTEGER PRIMARY KEY AUTOINCREMENT, userId VARCHAR(50), userName VARCHAR(50), bankAmount NUMERIC, cashAmount NUMERIC, profilePhoto VARCHAR(50))`,
-                [],
-              );
-              txn.executeSql(
-                `INSERT INTO ${tableName}(userId, userName, bankAmount, cashAmount, profilePhoto) VALUES(?,?,?,?,?)`,
-                [userId, userName, 0, 0, profilePhoto],
-                (tx, res) => {
-                  res.rowsAffected ? resolve(res.rowsAffected) : 'no rows affected';
-                },
-                (tx, error) => {
-                  console.log('error => ', error);
-                  reject(error);
-                },
-              );
-            } else {
-              // txn.executeSql(`DROP TABLE IF EXISTS ${table}`, []);
-            }
-          },
-        );
-      });
-    }
+    return new Promise((resolve, reject) => {
+      if (tableName) {
+        db.transaction((txn) => {
+          txn.executeSql(
+            // eslint-disable-next-line quotes
+            "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+            [tableName],
+            (tx, res) => {
+              console.log('item:', res.rows.length);
+              if (res.rows.length == 0) {
+                txn.executeSql(`DROP TABLE IF EXISTS ${tableName}`, []);
+                txn.executeSql(
+                  `CREATE TABLE IF NOT EXISTS ${tableName} (id INTEGER PRIMARY KEY AUTOINCREMENT, userId VARCHAR(50), userName VARCHAR(50), bankAmount NUMERIC, cashAmount NUMERIC, profilePhoto VARCHAR(50))`,
+                  [],
+                );
+                txn.executeSql(
+                  `INSERT INTO ${tableName}(userId, userName, bankAmount, cashAmount, profilePhoto) VALUES(?,?,?,?,?)`,
+                  [userId, userName, 0, 0, profilePhoto],
+                  (tx, res) => {
+                    res.rowsAffected ? resolve(res.rowsAffected) : 'no rows affected';
+                  },
+                  (tx, error) => {
+                    console.log('error => ', error);
+                    reject(error);
+                  },
+                );
+              } else {
+                // txn.executeSql(`DROP TABLE IF EXISTS ${table}`, []);
+              }
+            },
+          );
+        });
+      }
+    });
   }
   async insertData(transactionData) {
     const { name, amount, paymentMode, category, date, isExpense, userId } = transactionData;
     return new Promise((resolve, reject) => {
-      db.transaction(txn => {
+      db.transaction((txn) => {
         txn.executeSql(
           `INSERT INTO ${table}(userId, name, amount, paymentMode, category, date, isExpense, isSynced) VALUES(?,?,?,?,?,?,?,?)`,
           [userId, name, String(amount), paymentMode, category, date, isExpense, false],
@@ -76,7 +80,7 @@ class SQL {
   }
   listAllTransactions(userId) {
     return new Promise((resolve, reject) => {
-      db.transaction(txn => {
+      db.transaction((txn) => {
         txn.executeSql(
           `SELECT * FROM ${table} WHERE userId = ? ORDER BY id DESC`,
           [userId],
@@ -100,8 +104,9 @@ class SQL {
   }
   async getAllTables() {
     return new Promise((resolve, reject) => {
-      db.transaction(txn => {
+      db.transaction((txn) => {
         txn.executeSql(
+          // eslint-disable-next-line quotes
           `SELECT name FROM sqlite_master WHERE type='table'`,
           [],
           (tx, results) => {
@@ -140,7 +145,7 @@ class SQL {
 
       updateQuery += ' WHERE userId = ?';
       params.push(userId);
-      db.transaction(tx => {
+      db.transaction((tx) => {
         tx.executeSql(
           updateQuery,
           params,
@@ -163,7 +168,7 @@ class SQL {
   }
   async getTableData(tableName, userId) {
     return new Promise((resolve, reject) => {
-      db.transaction(txn => {
+      db.transaction((txn) => {
         txn.executeSql(
           `SELECT * FROM ${tableName} WHERE userId = ? ORDER BY id ASC`,
           [userId],
@@ -187,7 +192,7 @@ class SQL {
   }
   async parseDataFromFile(query) {
     return new Promise((resolve, reject) => {
-      db.transaction(txn => {
+      db.transaction((txn) => {
         txn.executeSql(
           query,
           [],
@@ -204,4 +209,4 @@ class SQL {
   }
 }
 
-export default SQLite = new SQL();
+export const SQLite = new SQL();

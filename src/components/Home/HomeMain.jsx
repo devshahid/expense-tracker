@@ -9,7 +9,7 @@ import GraphicalView from '../../views/GraphicalView';
 import ActivityLoader from '../Loaders/ActivityLoader';
 const HomeMain = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { userId } = useSelector(state => state.userDetails);
+  const { userId } = useSelector((state) => state.userDetails);
   const {
     transactionList,
     bankAmount,
@@ -21,7 +21,7 @@ const HomeMain = ({ navigation, route }) => {
     weeklyAmountArr,
     monthlyAmountArr,
     isLoading,
-  } = useSelector(state => state.transactions);
+  } = useSelector((state) => state.transactions);
   const [selectedTab, setSelectedTab] = useState('Today');
   const [graphLabels, setGraphLabels] = useState([
     '6AM-10AM',
@@ -37,6 +37,7 @@ const HomeMain = ({ navigation, route }) => {
   useEffect(() => {
     // dispatch action to read data from db for transaction list and income expense
     dispatch(getUserTransactions(userId));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ const HomeMain = ({ navigation, route }) => {
     if (transactionAdded) {
       dispatch(updateAmountArr(transactionList));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionAdded]);
   useEffect(() => {
     if (selectedTab === 'Today') {
@@ -77,6 +79,7 @@ const HomeMain = ({ navigation, route }) => {
 
   useEffect(() => {
     setToggleTransaction(!toggleTransaction);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route?.params?.isData]);
 
   const onRefresh = useCallback(() => {
@@ -85,7 +88,8 @@ const HomeMain = ({ navigation, route }) => {
       setRefreshing(false);
       setToggleTransaction(!toggleTransaction);
     }, 2000);
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (isLoading) {
     return <ActivityLoader />;

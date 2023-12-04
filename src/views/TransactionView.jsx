@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
   },
   modalHeaderContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomColor: 'rgba(0, 0, 0, 0.2)',

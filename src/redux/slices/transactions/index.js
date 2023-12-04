@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { tableNames } from '../../../constants/constant';
-import SQLite from '../../../sqlite/sql';
+import { SQLite } from '../../../sqlite/sql';
 import moment from 'moment';
 import { checkPaymentMode } from '../../../constants/data';
 import { getMonthlyData, getTodayData, getWeeklyData } from '../../../utils/getGraphData';
@@ -46,7 +46,7 @@ export const getUserTransactions = createAsyncThunk(
       let income = 0;
       let expense = 0;
       transactionList.length > 0 &&
-        transactionList.map(item => {
+        transactionList.map((item) => {
           const month = item.date.split('-')[1];
           if (month === currMonth) {
             if (item.isExpense === 0) {
@@ -140,7 +140,7 @@ export const transactionDetailsSlice = createSlice({
   name: 'transactionDetails',
   initialState,
   reducers: {
-    resetTransactionAdded: state => {
+    resetTransactionAdded: (state) => {
       state.transactionAdded = false;
       state.message = null;
     },
@@ -150,8 +150,8 @@ export const transactionDetailsSlice = createSlice({
       state.monthlyAmountArr = getMonthlyData(action.payload);
     },
   },
-  extraReducers: builder => {
-    builder.addCase(getUserTransactions.pending, state => {
+  extraReducers: (builder) => {
+    builder.addCase(getUserTransactions.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(getUserTransactions.fulfilled, (state, action) => {
@@ -171,14 +171,14 @@ export const transactionDetailsSlice = createSlice({
         state.monthlyAmountArr = action.payload?.monthlyAmountArr;
       }
       if (action.payload.transactionList) {
-        state.transactionList = [...action.payload?.transactionList];
+        state.transactionList = [...action.payload.transactionList];
       }
     });
     builder.addCase(getUserTransactions.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
     });
-    builder.addCase(AddOneTrasaction.pending, state => {
+    builder.addCase(AddOneTrasaction.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(AddOneTrasaction.fulfilled, (state, action) => {
@@ -207,7 +207,7 @@ export const transactionDetailsSlice = createSlice({
       state.transactionAdded = false;
       state.error = action.payload;
     });
-    builder.addCase(updateUserAmount.pending, state => {
+    builder.addCase(updateUserAmount.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(updateUserAmount.fulfilled, (state, action) => {
@@ -221,7 +221,7 @@ export const transactionDetailsSlice = createSlice({
         state.cashAmount = cashAmount;
       }
     });
-    builder.addCase(updateUserAmount.rejected, (state, action) => {
+    builder.addCase(updateUserAmount.rejected, (state) => {
       state.isLoading = false;
       state.transactionAdded = false;
     });

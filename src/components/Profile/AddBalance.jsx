@@ -4,14 +4,21 @@ import { Colours } from '../../constants/constant';
 import { Picker } from '@react-native-picker/picker';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { resetTransactionAdded, updateUserAmount } from '../../redux/slices/transactions';
+import {
+  AddOneTrasaction,
+  resetTransactionAdded,
+  updateUserAmount,
+} from '../../redux/slices/transactions';
 import ProfileModal from '../Modal/ProfileModal';
 import { showMessage } from 'react-native-flash-message';
+import ActivityLoader from '../Loaders/ActivityLoader';
+import moment from 'moment';
 
 const AddBalance = ({ state, setAddBalance }) => {
   const dispatch = useDispatch();
-  const { userId } = useSelector(state => state.userDetails);
-  const { transactionAdded, bankAmount, cashAmount } = useSelector(state => state.transactions);
+  const { userId } = useSelector((state) => state.userDetails);
+  const { transactionAdded, bankAmount, cashAmount, isLoading, incomeBal, expenseBal } =
+    useSelector((state) => state.transactions);
   const [amountDetails, setAmountDetails] = useState({
     select: 'Bank',
     amount: 0,
@@ -34,6 +41,7 @@ const AddBalance = ({ state, setAddBalance }) => {
       });
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, transactionAdded]);
   const handleInputs = (value, name) => {
     setAmountDetails({
@@ -42,6 +50,20 @@ const AddBalance = ({ state, setAddBalance }) => {
     });
   };
   const handleSubmitBtn = async () => {
+    const currentDate = moment(new Date()).format('DD-MM-YYYY HH:mm');
+    const newData = {
+      name: 'User Added Balance',
+      amount: amountDetails.amount,
+      category: 'User Added',
+      date: currentDate,
+      isExpense: false,
+      isSynced: 0,
+      userId,
+      bankAmount,
+      cashAmount,
+      incomeBal,
+      expenseBal,
+    };
     const newObj = {
       userId,
     };
@@ -49,12 +71,18 @@ const AddBalance = ({ state, setAddBalance }) => {
     // create a dispatch action to update the amount bank or cash in db and state as well based on -\+
     if (amountDetails.select === 'Bank') {
       newObj['bankAmount'] = amountDetails.amount + bankAmount;
+      newData['paymentMode'] = 'Net Banking';
     } else {
       newObj['cashAmount'] = amountDetails.amount + cashAmount;
+      newData['paymentMode'] = 'Cash';
     }
     console.log('newObj => ', newObj);
     dispatch(updateUserAmount(newObj));
+    dispatch(AddOneTrasaction(newData));
   };
+  if (isLoading) {
+    return <ActivityLoader />;
+  }
   return (
     <ProfileModal state={state} setState={setAddBalance}>
       <Text style={styles.balanceTitle}>Amount Details</Text>
@@ -63,13 +91,13 @@ const AddBalance = ({ state, setAddBalance }) => {
         placeholderTextColor={'#000000'}
         style={[styles.amountValue]}
         keyboardType="numeric"
-        onChangeText={value => handleInputs(Number(value), 'amount')}
+        onChangeText={(value) => handleInputs(Number(value), 'amount')}
       />
       <View style={styles.pickerViewContainer}>
         <Picker
           style={styles.pickerContainer}
           selectedValue={amountDetails.select}
-          onValueChange={option => {
+          onValueChange={(option) => {
             handleInputs(option, 'select');
           }}
           dropdownIconColor="#000000">

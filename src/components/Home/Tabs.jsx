@@ -2,7 +2,7 @@ import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React from 'react';
 import { Colours } from '../../constants/constant';
 
-const Tabs = props => {
+const Tabs = (props) => {
   return (
     <TouchableOpacity
       onPress={() => {

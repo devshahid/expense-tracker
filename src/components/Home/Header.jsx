@@ -1,14 +1,13 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'react-native';
 import { Colours, Images, tableNames } from '../../constants/constant';
-import SQLite from '../../sqlite/sql';
+import { SQLite } from '../../sqlite/sql';
 import { useSelector } from 'react-redux';
 const HeaderComponent = () => {
   const [userData, setUserData] = useState(null);
-  const { userId, profilePhoto } = useSelector(state => state.userDetails);
+  const { userId, profilePhoto } = useSelector((state) => state.userDetails);
   useEffect(() => {
     async function getUserInfo() {
       try {
@@ -20,6 +19,7 @@ const HeaderComponent = () => {
       }
     }
     getUserInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <View

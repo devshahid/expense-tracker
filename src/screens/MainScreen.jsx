@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { SafeAreaView, StyleSheet, Dimensions } from 'react-native';
+import { SafeAreaView, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import HomeStackNavigator from '../navigations/stack-navigators/HomeStackNavigator';
 import HeaderComponent from '../components/Home/Header';
 import HomeMain from '../components/Home/HomeMain';
 

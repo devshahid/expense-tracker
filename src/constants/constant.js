@@ -51,6 +51,7 @@ export const onboardingSlides = [
     image: Images.ONBOARDING_IMAGE_3,
     title: 'Data-Driven Insights',
     subtitle:
+      // eslint-disable-next-line prettier/prettier, quotes
       "Collaborate with our app's powerful tools and make informed decisions with your financial data",
   },
 ];

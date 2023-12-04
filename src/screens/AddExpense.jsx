@@ -6,16 +6,32 @@ import moment from 'moment';
 import { categoryOptions, paymentOptions } from '../constants/data';
 import DropdownContainer from '../components/Modal/DropdownContainer';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import { Colours, ScreenNames, tableNames } from '../constants/constant';
+import { Colours, ScreenNames } from '../constants/constant';
 import Snackbar from 'react-native-snackbar';
 import { useSelector, useDispatch } from 'react-redux';
 import { AddOneTrasaction, resetTransactionAdded } from '../redux/slices/transactions';
 import { showMessage } from 'react-native-flash-message';
-const AddExpense = ({ navigation }) => {
-  const { userId } = useSelector(state => state.userDetails);
-  const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message } = useSelector(
-    state => state.transactions,
+import ActivityLoader from '../components/Loaders/ActivityLoader';
+
+const PaymentAndCategoryContainer = ({ openModal, transactionDetails, type }) => {
+  const dataType =
+    type === 'Payment' ? transactionDetails.paymentMode : transactionDetails.category;
+  return (
+    <View style={styles.dropdownContainer}>
+      <TouchableOpacity
+        onPress={() => openModal(type)}
+        style={[styles.dropdown, styles.dropDownWithArrow]}>
+        <Text style={styles.selectedTextStyle}>{dataType}</Text>
+        <Icon name="chevron-down" size={20} style={styles.iconStyle} />
+      </TouchableOpacity>
+    </View>
   );
+};
+
+const AddExpense = ({ navigation }) => {
+  const { userId } = useSelector((state) => state.userDetails);
+  const { transactionAdded, bankAmount, cashAmount, incomeBal, expenseBal, message, isLoading } =
+    useSelector((state) => state.transactions);
   const dispatch = useDispatch();
   const [selectedBox, setSelectedBox] = useState('debit');
   const [selectedHeaderTxt, setSelectedHeaderTxt] = useState('Expense');
@@ -33,9 +49,10 @@ const AddExpense = ({ navigation }) => {
     isExpense: true,
     isSynced: 0,
   });
-  const checkEmptyInput = value => {
-    if (value) return true;
-    else return false;
+  const checkEmptyInput = (value) => {
+    if (value && value !== 'Payment Mode' && value !== 'Select Category') {
+      return true;
+    } else return false;
   };
   useEffect(() => {
     const { userId, name, amount, paymentMode, category } = transactionDetails;
@@ -75,7 +92,7 @@ const AddExpense = ({ navigation }) => {
     return () => {
       dispatch(resetTransactionAdded()); // Define and dispatch this action to reset the flag
     };
-  }, [dispatch, transactionAdded, message]);
+  }, [dispatch, transactionAdded, message, navigation]);
   const handleInputs = (value, name) => {
     setTransactionDetails({
       ...transactionDetails,
@@ -91,7 +108,7 @@ const AddExpense = ({ navigation }) => {
   const hideDatePicker = () => {
     setDatePickerVisibility(false);
   };
-  const handleConfirm = date => {
+  const handleConfirm = (date) => {
     const selectedDate = moment(date).format('DD-MM-YYYY');
     setSelectedDate(selectedDate);
     hideDatePicker();
@@ -114,7 +131,7 @@ const AddExpense = ({ navigation }) => {
   };
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
-  const openModal = type => {
+  const openModal = (type) => {
     setModalVisible(true);
     setModalType(type);
   };
@@ -123,6 +140,10 @@ const AddExpense = ({ navigation }) => {
     setModalVisible(false);
     setModalType('');
   };
+
+  if (isLoading) {
+    return <ActivityLoader />;
+  }
   return (
     <View
       style={[
@@ -150,7 +171,7 @@ const AddExpense = ({ navigation }) => {
             placeholderTextColor={'#FCFCFC'}
             style={[styles.amountValue, { fontSize: 60, width: '100%' }]}
             keyboardType="numeric"
-            onChangeText={value => handleInputs(Number(value), 'amount')}
+            onChangeText={(value) => handleInputs(Number(value), 'amount')}
           />
         </View>
       </View>
@@ -160,7 +181,7 @@ const AddExpense = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                onChangeText={value => handleInputs(value, 'name')}
+                onChangeText={(value) => handleInputs(value, 'name')}
                 placeholder="Name"
                 placeholderTextColor={'grey'}
                 value={transactionDetails.name}
@@ -213,22 +234,20 @@ const AddExpense = ({ navigation }) => {
               </Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.dropdownContainer}>
-            <TouchableOpacity
-              onPress={() => openModal('Payment')}
-              style={[styles.dropdown, styles.dropDownWithArrow]}>
-              <Text style={styles.selectedTextStyle}>{transactionDetails.paymentMode}</Text>
-              <Icon name="chevron-down" size={20} style={styles.iconStyle} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.dropdownContainer}>
-            <TouchableOpacity
-              onPress={() => openModal('Category')}
-              style={[styles.dropdown, styles.dropDownWithArrow]}>
-              <Text style={styles.selectedTextStyle}>{transactionDetails.category}</Text>
-              <Icon name="chevron-down" size={20} style={styles.iconStyle} />
-            </TouchableOpacity>
-          </View>
+
+          {/* DropDown container for payment mode */}
+          <PaymentAndCategoryContainer
+            openModal={openModal}
+            type="Payment"
+            transactionDetails={transactionDetails}
+          />
+
+          {/* DropDown container for category */}
+          <PaymentAndCategoryContainer
+            openModal={openModal}
+            type="Category"
+            transactionDetails={transactionDetails}
+          />
 
           <View style={{ width: '100%' }}>
             <TouchableOpacity style={styles.selectDateContainer} onPress={handleDateVisibility}>
