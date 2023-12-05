@@ -11,10 +11,11 @@ import InputText from '../components/InputText';
 import { toastMessage } from '../utils/toastMessage';
 import { validateInput } from '../utils/loginValidationHandler';
 import { ErrorText } from './SignupScreen';
+import ActivityLoader from '../components/Loaders/ActivityLoader';
 
 const Login = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { token } = useSelector((state) => state.userDetails);
+  const { token, isLoading } = useSelector((state) => state.userDetails);
 
   // useEffect handler to display toast when registration completed
   useEffect(() => {
@@ -47,7 +48,9 @@ const Login = ({ navigation, route }) => {
       [key]: output,
     });
   };
-
+  if (isLoading) {
+    return <ActivityLoader />;
+  }
   return (
     <ScrollView style={loginSignupStyle.scrollContainer} keyboardShouldPersistTaps="handled">
       <View style={loginSignupStyle.mainContainer}>

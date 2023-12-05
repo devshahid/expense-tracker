@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 import { check, request, PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions';
 import DocumentPicker from 'react-native-document-picker';
-import SQLite from '../sqlite/sql';
+import { SQLite } from '../sqlite/sql';
 import { showMessage } from 'react-native-flash-message';
 import { FileSystem } from 'react-native-file-access';
 export const storeDataInStorage = async (query) => {
@@ -49,14 +49,21 @@ export const storeDataInStorage = async (query) => {
 
 export const importDataFromFile = async () => {
   try {
-    const { uri } = await DocumentPicker.pickSingle();
-    const { userData, tranactionData } = JSON.parse(await RNFS.readFile(uri, 'utf8'));
-    const userResult = await parseQuery(userData);
-    const transactionResult = await parseQuery(tranactionData);
-    if (userResult && transactionResult) {
-      return true;
-    } else {
-      return false;
+    if (Platform.OS === 'android') {
+      const readPermission = await checkPermission(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
+      if (readPermission) {
+        const { uri } = await DocumentPicker.pickSingle();
+        console.log('uri ', uri);
+        const { userData, tranactionData } = JSON.parse(await RNFS.readFile(uri, 'utf8'));
+        console.log('userData, tranactionData ', userData, tranactionData);
+        const userResult = await parseQuery(userData);
+        const transactionResult = await parseQuery(tranactionData);
+        if (userResult && transactionResult) {
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
   } catch (error) {
     showMessage({

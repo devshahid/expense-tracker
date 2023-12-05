@@ -18,7 +18,7 @@ const TransactionList = (props) => {
         <View style={[styles.transactionIcon, { backgroundColor: backgroundColor }]}>
           <Icon5 name={icon} size={40} style={[{ color: color }, { padding: 5 }]} />
         </View>
-        <View style={{ marginHorizontal: 5, padding: 2 }}>
+        <View style={{ marginHorizontal: 5, padding: 2, marginRight: 40 }}>
           <Text numberOfLines={1} style={styles.transactionTitle}>
             {name}
           </Text>

@@ -23,6 +23,7 @@ export const categoryOptions = [
   { value: 'Salary', img: require('../assets/salary.png') },
   { value: 'Family', img: require('../assets/family.png') },
   { value: 'Lending', img: require('../assets/lending.png') },
+  { value: 'Investment', img: require('../assets/investment.png') },
   { value: 'Other', img: require('../assets/other.png') },
 ];
 export const transactionItems = {
@@ -120,6 +121,11 @@ export const transactionItems = {
     icon: 'user-plus',
     color: '#DFE89F',
     backgroundColor: '#5D1760',
+  },
+  Investment: {
+    icon: 'hands',
+    color: '#1B4F72',
+    backgroundColor: '#7FB3D5',
   },
   Other: {
     icon: 'ellipsis-h',
