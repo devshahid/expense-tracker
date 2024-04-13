@@ -1,0 +1,16 @@
+1. Need to change the see all list with Flat list
+2. When tap on any transaction, design screen to show all its details.
+3. Try to avoid user to next day transaction date - done
+4. Add a drop down for bank and cash and total balance
+5. Add validation on signup screen for all things firstname lastname and all
+6. Increase the size of fields showing very small -done
+7. No header is showing on sign up screen
+8. Add validation for password while login and try to create a eye feature
+9. Implement rest left over screens like, forget password. Verify account
+10. Make code more cleaner using custom hooks and reusable things.
+
+13/04/2024
+1. Round amount value to 2 digit
+2. In homescreen show recent transactions
+3. Make details screen for each transaction
+4. Try to add a loader while scrolling for all transactions.
