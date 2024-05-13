@@ -16,9 +16,9 @@ const TransactionView = ({ dataArr }) => {
       </View>
       <ScrollView>
         {dataArr.length > 0 ? (
-          dataArr
-            .slice(0, 10)
+          [...dataArr]
             .reverse()
+            .slice(0, 10)
             .map((element, i) => (
               <TransactionList
                 key={i}
