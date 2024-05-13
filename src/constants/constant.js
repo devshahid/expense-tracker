@@ -60,3 +60,9 @@ export const tableNames = {
   USER_TABLE: 'userdetails',
   TRANSACTION_TABLE: 'transactions',
 };
+
+export const BALANCE_DROPDOWN = {
+  TOTAL_BALANCE: 'Total_Balance',
+  CASH: 'Cash',
+  BANK: 'Bank',
+};

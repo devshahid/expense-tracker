@@ -2,11 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import TransactionView from '../../views/TransactionView';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Colours, ScreenNames } from '../../constants/constant';
+import { BALANCE_DROPDOWN, Colours, ScreenNames } from '../../constants/constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserTransactions, updateAmountArr } from '../../redux/slices/transactions';
 import GraphicalView from '../../views/GraphicalView';
 import ActivityLoader from '../Loaders/ActivityLoader';
+import HeaderComponent from './Header';
 const HomeMain = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { userId } = useSelector((state) => state.userDetails);
@@ -34,6 +35,7 @@ const HomeMain = ({ navigation, route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [toggleTransaction, setToggleTransaction] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [selectedOption, setSelectedOption] = useState(BALANCE_DROPDOWN.TOTAL_BALANCE);
   useEffect(() => {
     // dispatch action to read data from db for transaction list and income expense
     dispatch(getUserTransactions(userId));
@@ -41,8 +43,14 @@ const HomeMain = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    setTotalAmount(Number(cashAmount) + Number(bankAmount));
-  }, [bankAmount, cashAmount]);
+    if (selectedOption === BALANCE_DROPDOWN.TOTAL_BALANCE) {
+      setTotalAmount(Number(cashAmount) + Number(bankAmount));
+    } else if (selectedOption === BALANCE_DROPDOWN.CASH) {
+      setTotalAmount(Number(cashAmount));
+    } else {
+      setTotalAmount(Number(bankAmount));
+    }
+  }, [bankAmount, cashAmount, selectedOption]);
 
   // calculation graphical data
   useEffect(() => {
@@ -51,6 +59,7 @@ const HomeMain = ({ navigation, route }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionAdded]);
+
   useEffect(() => {
     if (selectedTab === 'Today') {
       setGraphLabels(['12AM-4AM', '4AM-8AM', '8AM-12PM', '12PM-4PM', '4PM-8PM', '8PM-12AM']);
@@ -91,12 +100,12 @@ const HomeMain = ({ navigation, route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoading) {
-    return <ActivityLoader />;
-  }
+  if (isLoading) return <ActivityLoader />;
+
   return (
     <>
       <View style={{ flex: 1, backgroundColor: Colours.WHITE_PURE }}>
+        <HeaderComponent selectedOption={selectedOption} setSelectedOption={setSelectedOption} />
         <ScrollView
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <View
@@ -106,7 +115,9 @@ const HomeMain = ({ navigation, route }) => {
               backgroundColor: Colours.WHITE_PURE,
             }}>
             <View style={styles.balanceContainer}>
-              <Text style={styles.balanceStyle}>₹ {totalAmount}</Text>
+              <Text style={styles.balanceStyle}>
+                ₹ {totalAmount > 0 ? totalAmount.toFixed(2) : totalAmount}
+              </Text>
             </View>
             <View style={styles.incomeExpMainContainer}>
               <View style={[styles.incomeExpContainer, { backgroundColor: Colours.GREEN_THEME }]}>
@@ -128,7 +139,6 @@ const HomeMain = ({ navigation, route }) => {
                 </View>
               </View>
             </View>
-            {/* created a specific view for graph container */}
             <GraphicalView
               graphLabels={graphLabels}
               graphData={graphData}
